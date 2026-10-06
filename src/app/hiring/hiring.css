@@ -1,0 +1,1304 @@
+/* Hiring postings — appointment shell + green accents + aligned numbers */
+
+.pca-root .hiring-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pca-root .hiring-day-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.pca-root .hiring-day-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: #000;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pca-root .hiring-day-tab:hover {
+  background: #f5f6f8;
+}
+
+.pca-root .hiring-day-tab.is-active {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.pca-root .hiring-day-tab-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+  font-size: 11.5px;
+}
+
+.pca-root .hiring-day-card .day-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-left: 0;
+  margin-right: 0;
+  background: #e6e8eb;
+  border-bottom: 1px solid #c5c9ce;
+  padding: 16px 28px;
+  min-height: 52px;
+}
+
+.pca-root .hiring-day-card .day-name {
+  grid-column: 2;
+  color: #222;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.pca-root .hiring-day-card .day-sum {
+  grid-column: 3;
+  justify-self: end;
+  color: #555;
+}
+
+.pca-root .wrap.hiring-wrap {
+  max-width: 1680px;
+  width: 100%;
+  padding: 16px 24px 28px;
+  overflow: visible;
+}
+
+.pca-root .day-card.hiring-day-card {
+  padding: 0 0 8px;
+  overflow-x: auto;
+}
+
+.pca-root .hiring-table {
+  width: 100%;
+  min-width: 1100px;
+  border: 1px solid #c5c9ce;
+  border-top: none;
+  box-sizing: border-box;
+}
+
+.pca-root .hiring-table .slot-head.hiring-meta-head,
+.pca-root .hiring-table a.row.hiring-meta-row {
+  display: grid;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  grid-template-columns: 56px minmax(0, 1.2fr) minmax(0, 1.9fr) minmax(0, 1.1fr) minmax(0, 92px);
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid #c5c9ce;
+}
+
+.pca-root .hiring-table a.row.hiring-meta-row:last-child {
+  border-bottom: 0;
+}
+
+.pca-root .hiring-day-card .slot-head.hiring-meta-head {
+  margin-top: 0;
+  background: #e6e8eb;
+  min-height: 48px;
+}
+
+.pca-root .hiring-table .hiring-meta-head span,
+.pca-root .hiring-table a.hiring-meta-row > span {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 14px;
+  border-right: 1px solid #c5c9ce;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pca-root .hiring-table .hiring-meta-head span:last-child,
+.pca-root .hiring-table a.hiring-meta-row > span:last-child {
+  border-right: 0;
+}
+
+.pca-root .hiring-day-card .hiring-meta-head span {
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #222;
+  white-space: normal;
+}
+
+.pca-root .hiring-table .hiring-meta-head span:last-child {
+  text-align: left;
+}
+
+.pca-root .hiring-cell {
+  min-width: 0;
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
+  align-items: flex-start;
+}
+
+.pca-root a.hiring-job-row {
+  text-decoration: none;
+  color: inherit;
+}
+
+.pca-root a.hiring-job-row:hover {
+  background: #f3f4f6;
+}
+
+.pca-root .hiring-num {
+  width: 100%;
+  justify-self: stretch;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #6f6f6f;
+  line-height: 1.2;
+}
+
+.pca-root .hiring-job-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-self: stretch;
+  gap: 2px;
+  min-width: 0;
+  font-weight: 600;
+  text-align: left;
+}
+
+.pca-root .hiring-job-title,
+.pca-root .hiring-job-sub {
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.pca-root .hiring-apply {
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  height: auto;
+  width: 100%;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1155cc;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .pca-root .hiring-day-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .pca-root .hiring-day-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pca-root .hiring-day-tab {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .pca-root .wrap.hiring-wrap {
+    max-width: none;
+    padding: 10px 8px 20px;
+  }
+
+  .pca-root .hiring-day-card .slot-head.hiring-meta-head {
+    display: grid;
+  }
+
+  .pca-root .hiring-table {
+    min-width: 980px;
+  }
+
+  .pca-root .hiring-table a.row.hiring-meta-row,
+  .pca-root .hiring-table .slot-head.hiring-meta-head {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 56px minmax(0, 1.2fr) minmax(0, 1.9fr) minmax(0, 1.1fr) minmax(0, 92px);
+    gap: 0;
+    padding: 0;
+    min-width: 0;
+    border: 0;
+    border-bottom: 1px solid #c5c9ce;
+  }
+}
+
+.pca-root .hiring-table .hiring-empty-row {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 18px 14px;
+  border: 0;
+  color: #6f6f6f;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+/* ============================================================
+   Hiring page polish — typography, line work, colour only.
+   Layout, grid columns and markup are unchanged.
+   ============================================================ */
+
+.pca-root .hiring-wrap {
+  --h-line:      #e6eaee;   /* outer + header rules            */
+  --h-hairline:  #f0f2f5;   /* between rows                    */
+  --h-ink:       #14181d;   /* company / primary               */
+  --h-ink-2:     #39424e;   /* job title                       */
+  --h-muted:     #5f6975;   /* location, salary                */
+  --h-faint:     #a8b0ba;   /* row numbers, em-dashes          */
+}
+
+/* ---------- the card ---------- */
+.pca-root .day-card.hiring-day-card {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--h-line);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+/* Day header: keep the grey band, just tidy the type and rule */
+.pca-root .hiring-day-card .day-head {
+  background: #e9ecef;
+  border-bottom: 1px solid #d4dae0;
+  padding: 15px 22px;
+  min-height: 50px;
+}
+
+.pca-root .hiring-day-card .day-name {
+  font-family: var(--font-sora), "Segoe UI", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #1a1f25;
+}
+
+.pca-root .hiring-day-card .day-sum {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #4a545f;
+}
+
+/* ---------- table frame ---------- */
+.pca-root .hiring-table {
+  border: 0;
+}
+
+/* Column head: quiet label row, not a heavy band */
+.pca-root .hiring-day-card .slot-head.hiring-meta-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--h-line);
+  min-height: 36px;
+}
+
+.pca-root .hiring-day-card .hiring-meta-head span {
+  font-family: var(--font-sora), "Segoe UI", Arial, sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--h-muted);
+  padding: 9px 14px;
+}
+
+/* ---------- line work: horizontal only ---------- */
+.pca-root .hiring-table .hiring-meta-head span,
+.pca-root .hiring-table a.hiring-meta-row > span {
+  border-right: 0;                 /* kill the spreadsheet grid */
+  padding: 15px 16px;
+}
+
+.pca-root .hiring-table .slot-head.hiring-meta-head,
+.pca-root .hiring-table a.row.hiring-meta-row {
+  border-bottom: 1px solid var(--h-hairline);
+}
+
+.pca-root .hiring-table a.row.hiring-meta-row:last-child {
+  border-bottom: 0;
+}
+
+.pca-root a.hiring-job-row:hover {
+  background: #fafbfc;
+}
+
+/* ---------- type hierarchy ---------- */
+.pca-root .hiring-num {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--h-faint);
+}
+
+/* Company — the anchor of the row */
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell:nth-child(2) {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--h-ink);
+}
+
+/* Job title — regular weight, so the eye lands on company first */
+.pca-root .hiring-cell.hiring-job-title {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--h-ink-2);
+}
+
+/* Job Site — supporting detail */
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell:nth-child(4) {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--h-muted);
+}
+
+/* Empty values recede instead of shouting */
+.pca-root .hiring-cell.is-empty {
+  color: var(--h-faint);
+  font-weight: 400;
+}
+
+/* ---------- Apply: button, not a raw link ---------- */
+.pca-root .hiring-apply {
+  justify-content: center;
+  align-self: center;
+  height: 29px;
+  width: auto;
+  min-width: 68px;
+  padding: 0 12px;
+  border: 1px solid var(--h-line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--h-ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.13s ease, border-color 0.13s ease, color 0.13s ease;
+}
+
+.pca-root a.hiring-job-row:hover .hiring-apply {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff;
+}
+
+/* ---------- day tabs ---------- */
+.pca-root .hiring-day-tabs {
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.pca-root .hiring-day-tab {
+  height: 31px;
+  border-color: var(--h-line);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--h-ink-2);
+}
+
+.pca-root .hiring-day-tab:hover {
+  background: #fafbfc;
+  border-color: #d8dee5;
+}
+
+.pca-root .hiring-day-tab.is-active {
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.pca-root .hiring-day-tab-count {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 1;
+  color: var(--h-faint);
+}
+
+.pca-root .hiring-day-tab.is-active .hiring-day-tab-count {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ---------- page title ---------- */
+.pca-root .page-subtitle {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--h-muted);
+}
+
+/* ---------- fixes: empty cells must never read as a value ---------- */
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell.is-empty,
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell.is-empty:nth-child(5) {
+  color: var(--h-faint);
+  font-weight: 400;
+}
+
+/* ---------- fit the row on a laptop so Apply is never cut off ---------- */
+.pca-root .hiring-table {
+  min-width: 0;
+}
+
+.pca-root .hiring-table .slot-head.hiring-meta-head,
+.pca-root .hiring-table a.row.hiring-meta-row {
+  grid-template-columns:
+    44px                    /* #        */
+    minmax(0, 1.3fr)        /* company  */
+    minmax(0, 1.9fr)        /* job title*/
+    minmax(0, 1.05fr)       /* job site */
+    92px;                   /* apply    */
+}
+
+/* Below tablet the table scrolls, but keep the same proportions */
+@media (max-width: 860px) {
+  .pca-root .hiring-table {
+    min-width: 820px;
+  }
+  .pca-root .hiring-table .slot-head.hiring-meta-head,
+  .pca-root .hiring-table a.row.hiring-meta-row {
+    grid-template-columns: 40px minmax(0,1.3fr) minmax(0,1.9fr) minmax(0,1.05fr) 86px;
+  }
+}
+
+/* ============================================================
+   Requested: all text black · rules on every column · bigger title row
+   ============================================================ */
+
+/* ---------- 1. black text everywhere in the table ---------- */
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell,
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell:nth-child(2),
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell:nth-child(4),
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell:nth-child(5),
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell.is-empty,
+.pca-root .hiring-table a.hiring-meta-row > span.hiring-cell.is-empty:nth-child(5),
+.pca-root .hiring-cell.hiring-job-title,
+.pca-root .hiring-cell.hiring-job-title.is-empty,
+.pca-root .hiring-num,
+.pca-root .hiring-day-card .day-name,
+.pca-root .hiring-day-card .day-sum {
+  color: #000;
+}
+
+.pca-root .hiring-day-card .hiring-meta-head span {
+  color: #000;
+  font-weight: 700;
+}
+
+.pca-root .hiring-apply {
+  color: #000;
+}
+
+/* keep the hover state readable — white on red */
+.pca-root a.hiring-job-row:hover .hiring-apply {
+  color: #fff;
+}
+
+/* ---------- 2. a rule on every column ---------- */
+.pca-root .hiring-table .hiring-meta-head span,
+.pca-root .hiring-table a.hiring-meta-row > span {
+  border-right: 1px solid #d4dae0;
+}
+
+.pca-root .hiring-table .hiring-meta-head span:last-child,
+.pca-root .hiring-table a.hiring-meta-row > span:last-child {
+  border-right: 0;
+}
+
+.pca-root .hiring-table .slot-head.hiring-meta-head,
+.pca-root .hiring-table a.row.hiring-meta-row {
+  border-bottom: 1px solid #d4dae0;
+}
+
+/* ---------- 3. bigger title rows ---------- */
+.pca-root .hiring-day-card .day-head {
+  min-height: 62px;
+  padding: 19px 22px;
+}
+
+.pca-root .hiring-day-card .day-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.pca-root .hiring-day-card .day-sum {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pca-root .hiring-day-card .slot-head.hiring-meta-head {
+  min-height: 34px;
+  background: #eef1f4;
+}
+
+.pca-root .hiring-day-card .hiring-meta-head span {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+}
+
+/* ---------- fix: hover must never blank out the active tab ---------- */
+.pca-root .hiring-day-tab:hover {
+  background: #fafbfc;
+  border-color: #d8dee5;
+}
+
+.pca-root .hiring-day-tab.is-active,
+.pca-root .hiring-day-tab.is-active:hover {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  box-shadow: none;
+}
+
+.pca-root .hiring-day-tab.is-active .hiring-day-tab-count,
+.pca-root .hiring-day-tab.is-active:hover .hiring-day-tab-count {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- fix: never let a scraped blob stretch a row ---------- */
+.pca-root .hiring-cell {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================================
+   Calendar day tiles · red accent · wider table · borderless Apply
+   · only the data rows scroll
+   ============================================================ */
+
+/* ---------- wider table ---------- */
+.pca-root .wrap.hiring-wrap {
+  max-width: none;
+  width: 100%;
+  padding: 14px 20px 0;
+}
+
+/* ---------- calendar tiles ---------- */
+.pca-root .hiring-day-tabs {
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 2px;
+}
+
+.pca-root .hiring-day-tab.cal-tile {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  justify-items: center;
+  align-content: center;
+  gap: 0;
+  position: relative;
+  width: 78px;
+  height: 82px;
+  padding: 8px 0 0;
+  border: 1px solid #d4dae0;
+  border-radius: 10px;
+  background: #fff;
+  color: #000;
+  transition: border-color .13s ease, background .13s ease, box-shadow .13s ease;
+}
+
+.pca-root .cal-tile .cal-dow {
+  font-family: var(--font-sora), "Segoe UI", Arial, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--red);
+  line-height: 1;
+}
+
+.pca-root .cal-tile .cal-num {
+  font-family: var(--font-sora), "Segoe UI", Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: #000;
+  font-variant-numeric: tabular-nums;
+}
+
+.pca-root .cal-tile .cal-mon {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #000;
+  line-height: 1;
+}
+
+/* count sits as a badge on the tile corner */
+.pca-root .cal-tile .hiring-day-tab-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #eef1f4;
+  border: 1px solid #d4dae0;
+  color: #000;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pca-root .hiring-day-tab.cal-tile:hover {
+  background: #fff;
+  border-color: var(--red);
+  box-shadow: 0 1px 3px rgba(197, 34, 31, .14);
+}
+
+/* ---------- red active day ---------- */
+.pca-root .hiring-day-tab.cal-tile.is-active,
+.pca-root .hiring-day-tab.cal-tile.is-active:hover {
+  background: var(--red);
+  border-color: var(--red);
+  box-shadow: 0 2px 6px rgba(197, 34, 31, .22);
+}
+
+.pca-root .cal-tile.is-active .cal-dow,
+.pca-root .cal-tile.is-active .cal-num,
+.pca-root .cal-tile.is-active .cal-mon {
+  color: #fff;
+}
+
+.pca-root .cal-tile.is-active .hiring-day-tab-count {
+  background: #fff;
+  border-color: #fff;
+  color: #000;
+}
+
+/* today's tile is marked even when not selected */
+.pca-root .cal-tile.is-today:not(.is-active) {
+  border-color: var(--red);
+  border-style: dashed;
+}
+
+/* ---------- Apply: no container border, dashboard arrow ---------- */
+.pca-root .hiring-apply {
+  justify-content: flex-start;
+  gap: 5px;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pca-root .hiring-apply .apply-arrow {
+  transition: transform .13s ease;
+}
+
+.pca-root a.hiring-job-row:hover .hiring-apply {
+  background: none;
+  border: 0;
+  color: var(--red);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pca-root a.hiring-job-row:hover .hiring-apply .apply-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* ---------- only the data rows scroll ---------- */
+.pca-root .day-card.hiring-day-card {
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.pca-root .hiring-rows {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  max-height: calc(100vh - 330px);
+}
+
+.pca-root .hiring-table .slot-head.hiring-meta-head {
+  position: static;      /* the header block itself no longer scrolls */
+}
+
+/* tidy scrollbar */
+.pca-root .hiring-rows::-webkit-scrollbar {
+  width: 10px;
+}
+.pca-root .hiring-rows::-webkit-scrollbar-thumb {
+  background: #cbd2d9;
+  border-radius: 8px;
+  border: 3px solid #fff;
+}
+.pca-root .hiring-rows::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+/* ============================================================
+   Calendar strip lives in the header, right of the page title
+   ============================================================ */
+
+.pca-root .site-header .topbar-inner {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  max-width: none;
+}
+
+.pca-root .site-header .page-title {
+  justify-self: start;
+  text-align: left;
+  padding-left: 8px;
+}
+
+.pca-root .site-header .page-title h1,
+.pca-root .site-header .page-subtitle {
+  text-align: left;
+}
+
+.pca-root .site-header .actions {
+  justify-self: end;
+}
+
+/* the strip itself */
+.pca-root .site-header .hiring-day-tabs {
+  display: flex;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pca-root .site-header .hiring-day-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* compact tiles so the strip fits beside the title */
+.pca-root .site-header .hiring-day-tab.cal-tile {
+  width: 62px;
+  height: 66px;
+  padding: 6px 0 0;
+  border-radius: 9px;
+  flex: none;
+}
+
+.pca-root .site-header .cal-tile .cal-dow {
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+.pca-root .site-header .cal-tile .cal-num {
+  font-size: 19px;
+}
+
+.pca-root .site-header .cal-tile .cal-mon {
+  font-size: 9px;
+  letter-spacing: .06em;
+}
+
+.pca-root .site-header .cal-tile .hiring-day-tab-count {
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px;
+}
+
+/* the table starts right under the rule now */
+.pca-root .wrap.hiring-wrap {
+  padding-top: 16px;
+}
+
+.pca-root .hiring-rows {
+  max-height: calc(100vh - 268px);
+}
+
+@media (max-width: 1100px) {
+  .pca-root .site-header .topbar-inner {
+    grid-template-columns: auto 1fr;
+    row-gap: 10px;
+  }
+  .pca-root .site-header .actions {
+    grid-column: 1 / -1;
+    justify-self: start;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   Fix: clicking a calendar day left an orange focus ring, and the
+   corner count badge was clipped by the strip's overflow.
+   ============================================================ */
+
+/* no ring on mouse click; a clean red ring for keyboard users only */
+.pca-root .hiring-day-tab.cal-tile:focus {
+  outline: none;
+}
+
+.pca-root .hiring-day-tab.cal-tile:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.pca-root .hiring-day-tab.cal-tile::-moz-focus-inner {
+  border: 0;
+}
+
+/* room for the badge that overhangs the tile corner */
+.pca-root .site-header .hiring-day-tabs {
+  padding: 9px 7px;
+  margin: -9px -7px;
+  overflow: visible;
+}
+
+/* only scroll the strip when it genuinely cannot fit */
+@media (max-width: 1240px) {
+  .pca-root .site-header .hiring-day-tabs {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+}
+
+/* keep the active tile obvious while it holds focus */
+.pca-root .hiring-day-tab.cal-tile.is-active:focus,
+.pca-root .hiring-day-tab.cal-tile.is-active:focus-visible {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+/* ============================================================
+   Fixes: click flash · column alignment · centred, capitalised title
+   ============================================================ */
+
+/* 1. background and colour must change together, or the label goes
+      white-on-white for the length of the transition */
+.pca-root .hiring-day-tab.cal-tile,
+.pca-root .cal-tile .cal-dow,
+.pca-root .cal-tile .cal-num,
+.pca-root .cal-tile .cal-mon,
+.pca-root .cal-tile .hiring-day-tab-count {
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+
+/* 2. the scrollbar sits inside the row list, so reserve the same
+      gutter on the header row and the columns line up dead straight */
+.pca-root .hiring-table {
+  --sbw: 10px;
+}
+
+.pca-root .hiring-rows {
+  scrollbar-gutter: stable;
+}
+
+.pca-root .hiring-table .slot-head.hiring-meta-head {
+  padding-right: var(--sbw);
+}
+
+/* the day title band spans the same box as the columns below it */
+.pca-root .hiring-day-card .day-head {
+  padding-right: calc(22px + var(--sbw));
+}
+
+/* 3. title centred on the page, calendar on the right */
+.pca-root .site-header .topbar-inner {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.pca-root .site-header .page-title {
+  justify-self: center;
+  text-align: center;
+  padding-left: 0;
+}
+
+.pca-root .site-header .page-title h1,
+.pca-root .site-header .page-subtitle {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.pca-root .site-header .page-title h1 {
+  letter-spacing: .04em;
+}
+
+.pca-root .site-header .page-subtitle {
+  letter-spacing: .08em;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+/* ---------- breathing room between the table and the footer ---------- */
+.pca-root .wrap.hiring-wrap {
+  padding-bottom: 22px;
+}
+
+.pca-root .day-card.hiring-day-card {
+  margin-bottom: 6px;
+}
+
+/* the row list shrinks by the same amount so the page still does not scroll */
+.pca-root .hiring-rows {
+  max-height: calc(100vh - 296px);
+}
+/* ============================================================
+   Column rules as one continuous overlay.
+   Drawn per-cell they break at every row edge, and a row clipped
+   mid-scroll under the fixed header leaves ragged line fragments.
+   ============================================================ */
+.pca-root .hiring-table {
+  position: relative;
+}
+
+.pca-root .hiring-col-rules {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns:
+    44px minmax(0, 1.3fr) minmax(0, 1.9fr) minmax(0, 1.05fr) 92px;
+  padding-right: var(--sbw);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pca-root .hiring-col-rules > span {
+  border-right: 1px solid #d4dae0;
+}
+
+.pca-root .hiring-col-rules > span:last-child {
+  border-right: 0;
+}
+
+/* the cells stop drawing their own verticals */
+.pca-root .hiring-table .hiring-meta-head span,
+.pca-root .hiring-table a.hiring-meta-row > span {
+  border-right: 0;
+}
+
+@media (max-width: 860px) {
+  .pca-root .hiring-col-rules {
+    grid-template-columns: 40px minmax(0,1.3fr) minmax(0,1.9fr) minmax(0,1.05fr) 86px;
+  }
+}
+/* ---------- no footer on this page: reclaim its height ---------- */
+.pca-root .hiring-rows {
+  max-height: calc(100vh - 258px);
+}
+
+/* ---------- page title: match the Cubic dashboard title (Michroma) ---------- */
+.pca-root .site-header .page-title h1 {
+  font-family: var(--font-michroma), Eurostile, "Arial Black", sans-serif;
+  font-size: 27px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: var(--red);
+  -webkit-text-stroke: 0.7px var(--red);
+  paint-order: stroke fill;
+}
+
+.pca-root .site-header .page-subtitle {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: #000;
+}
+/* ============================================================
+   Fill-the-viewport layout, no magic numbers.
+   A fixed `max-height` on the row list was 21px too tall and clipped
+   the bottom of the table; it also broke whenever the header height
+   changed (calendar strip wrapping, bigger title). Scoped to
+   .hiring-root so the shared .pca-root pages are untouched.
+   ============================================================ */
+.pca-root.hiring-root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.hiring-root .site-header {
+  flex: none;
+}
+
+.hiring-root .pca-body,
+.hiring-root .wrap.hiring-wrap,
+.hiring-root .day-card.hiring-day-card,
+.hiring-root .hiring-table {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.hiring-root .hiring-day-card .day-head,
+.hiring-root .slot-head.hiring-meta-head {
+  flex: none;
+}
+
+/* the row list is the only thing that scrolls, and it takes exactly
+   whatever height is left over */
+.hiring-root .hiring-rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+/* Setting `display:flex` above outranks the UA's `[hidden]{display:none}`,
+   which un-hid every day pane at once. Restore hiding explicitly. */
+.hiring-root .day-card.hiring-day-card[hidden] {
+  display: none;
+}
+/* ---------- title ---------- */
+.pca-root .site-header .page-title h1 {
+  font-family: var(--font-michroma), Eurostile, "Arial Black", sans-serif;
+  font-size: 27px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 900px) {
+  .pca-root .site-header .page-title h1 {
+    font-size: 20px;
+  }
+}
+@media (max-width: 560px) {
+  .pca-root .site-header .page-title h1 {
+    font-size: 17px;
+  }
+}
+
+.pca-root .site-header .page-subtitle {
+  margin-top: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .09em;
+}
+
+/* Calendar tiles: never fade label color. A color transition on the
+   numbers/weekday turns them white while the tile is still a light
+   background, so the date vanishes for a beat on every click. */
+.pca-root .hiring-day-tab.cal-tile {
+  -webkit-appearance: none;
+  appearance: none;
+  color: #000;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.pca-root .hiring-day-tab.cal-tile .cal-dow,
+.pca-root .hiring-day-tab.cal-tile .cal-num,
+.pca-root .hiring-day-tab.cal-tile .cal-mon,
+.pca-root .hiring-day-tab.cal-tile .hiring-day-tab-count {
+  transition: none;
+}
+
+.pca-root .hiring-day-tab.cal-tile:not(.is-active) .cal-dow,
+.pca-root .hiring-day-tab.cal-tile:active:not(.is-active) .cal-dow {
+  color: var(--red);
+}
+
+.pca-root .hiring-day-tab.cal-tile:not(.is-active) .cal-num,
+.pca-root .hiring-day-tab.cal-tile:not(.is-active) .cal-mon,
+.pca-root .hiring-day-tab.cal-tile:active:not(.is-active) .cal-num,
+.pca-root .hiring-day-tab.cal-tile:active:not(.is-active) .cal-mon {
+  color: #000;
+}
+
+.pca-root .hiring-day-tab.cal-tile.is-active,
+.pca-root .hiring-day-tab.cal-tile.is-active:hover,
+.pca-root .hiring-day-tab.cal-tile.is-active:focus,
+.pca-root .hiring-day-tab.cal-tile.is-active:active {
+  color: #fff;
+  background: var(--red);
+  background-color: var(--red);
+}
+
+.pca-root .hiring-day-tab.cal-tile.is-active .cal-dow,
+.pca-root .hiring-day-tab.cal-tile.is-active .cal-num,
+.pca-root .hiring-day-tab.cal-tile.is-active .cal-mon {
+  color: #fff;
+}
+
+/* Corner job counts stay black. Do not inherit the tile's white/red label color. */
+.pca-root .hiring-day-tab.cal-tile .hiring-day-tab-count,
+.pca-root .hiring-day-tab.cal-tile:hover .hiring-day-tab-count,
+.pca-root .hiring-day-tab.cal-tile:active:not(.is-active) .hiring-day-tab-count {
+  background: #eef1f4;
+  border: 1px solid #d4dae0;
+  color: #000;
+  -webkit-text-fill-color: #000;
+}
+
+.pca-root .hiring-day-tab.cal-tile.is-active .hiring-day-tab-count,
+.pca-root .hiring-day-tab.cal-tile.is-active:hover .hiring-day-tab-count,
+.pca-root .hiring-day-tab.cal-tile.is-active:focus .hiring-day-tab-count,
+.pca-root .hiring-day-tab.cal-tile.is-active:active .hiring-day-tab-count {
+  background: #fff;
+  border-color: #fff;
+  color: #000;
+  -webkit-text-fill-color: #000;
+}
+
+.hiring-root .day-card.hiring-day-card[hidden] {
+  display: none !important;
+}
+
+/* Openings count sits just right of the date, not flush to the table edge.
+   Cells keep a clear gap off the vertical column rules. */
+.pca-root .hiring-day-card .day-head {
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 16px;
+  padding-left: 22px;
+  padding-right: 28px;
+}
+
+.pca-root .hiring-day-card .day-name {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.pca-root .hiring-day-card .day-sum {
+  grid-column: 3;
+  justify-self: end;
+  text-align: right;
+  padding-left: 0;
+  padding-right: 6px;
+  white-space: nowrap;
+}
+
+.pca-root .hiring-table .hiring-meta-head span,
+.pca-root .hiring-table a.hiring-meta-row > span {
+  padding-left: 20px;
+  padding-right: 18px;
+}
+
+.pca-root .hiring-table .hiring-meta-head span:first-child,
+.pca-root .hiring-table a.hiring-meta-row > span:first-child {
+  padding-left: 16px;
+  padding-right: 10px;
+}
+
+/* ============================================================
+   Few postings: the card stops at the last row.
+   The fill-the-viewport rules stretched the card to 100dvh no
+   matter how many rows there were, so a light day left the four
+   column rules running down through empty space to the bottom of
+   the screen. Shrink-to-fit still shrinks (flex-shrink: 1) on a
+   heavy day, so the row list keeps scrolling as before.
+   ============================================================ */
+.hiring-root .day-card.hiring-day-card,
+.hiring-root .hiring-table {
+  flex: 0 1 auto;
+}
+
+/* The rules overlay is inset:0 on the table, so with the card sized
+   to content it now ends at the last row on its own. */
+
+.pca-root .hiring-table .hiring-empty-row {
+  padding: 28px 14px;
+  color: var(--h-faint);
+}
+
+/* ---------- shorter header: tighter padding and calendar tiles ---------- */
+.pca-root.hiring-root .site-header .topbar {
+  padding-top: 7px;
+  padding-bottom: 6px;
+}
+
+.pca-root.hiring-root .site-header .topbar-inner {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  min-height: 0;
+}
+
+.pca-root.hiring-root .site-header .hiring-day-tab.cal-tile {
+  width: 56px;
+  height: 54px;
+  padding: 3px 0 0;
+  border-radius: 8px;
+}
+
+.pca-root.hiring-root .site-header .cal-tile .cal-num {
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+.pca-root.hiring-root .site-header .cal-tile .cal-dow,
+.pca-root.hiring-root .site-header .cal-tile .cal-mon {
+  font-size: 8.5px;
+}
+
+.pca-root.hiring-root .site-header .page-title h1 {
+  line-height: 1.1;
+}
+
+.pca-root.hiring-root .site-header .page-subtitle {
+  margin-top: 2px;
+}
+
+/* scrollbars are hidden site-wide: no gutter to line the header up with */
+.pca-root .hiring-table {
+  --sbw: 0px;
+}
+
+.pca-root .hiring-rows {
+  scrollbar-gutter: auto;
+}

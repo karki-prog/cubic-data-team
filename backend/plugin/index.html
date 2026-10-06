@@ -1,0 +1,2141 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cubic AI</title>
+<!-- Served from the Cubic origin, so fetches to /api/* below are same-origin
+     and carry the session cookie. The editor itself lives on the Document
+     Server origin; only this iframe is ours. -->
+<!-- plugins.js comes from the Document Server we are actually running, not a
+     CDN: it must match the editor version, and an offline box must still work.
+     __DOCSERVER__ is substituted when this file is served. -->
+<script src="__DOCSERVER__/sdkjs-plugins/v1/plugins.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  /* The panel is a column: the title bar stays put and the sections scroll. */
+  body {
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; overflow: hidden;
+    font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #10141a; background: #fff;
+  }
+  .bar { flex: none; padding: 12px 12px 8px; border-bottom: 1px solid #eef1f4; background: #fff; }
+  #scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 10px 12px 16px; }
+  h1 { margin: 0 0 2px; font-size: 14px; font-weight: 700; }
+  .sub { margin: 0; font-size: 11.5px; color: #6f6f6f; }
+  .toolrow { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .sec { border: 1px solid #e4e8ec; border-radius: 9px; margin-bottom: 6px; overflow: hidden; }
+  .sec.open { border-color: #c9d0d7; }
+  .head {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    padding: 9px 11px; border: 0; background: #fff; cursor: pointer; text-align: left; font: inherit;
+  }
+  .head:hover { background: #fafbfc; }
+  .head .name { flex: 1; font-weight: 600; font-size: 12.5px; }
+  .count { padding: 1px 6px; border-radius: 999px; background: #f2f4f7; font-size: 10.5px; color: #6f6f6f; }
+  .chev { color: #9aa0a6; }
+  .body { padding: 0 11px 11px; border-top: 1px solid #e4e8ec; }
+  label { display: block; margin: 10px 0 4px; font-size: 11px; font-weight: 600; }
+  .opt { color: #9aa0a6; font-weight: 500; }
+  textarea {
+    width: 100%; padding: 7px 9px; border: 1px solid #e4e8ec; border-radius: 7px;
+    font: inherit; font-size: 12px; line-height: 1.45; resize: vertical;
+  }
+  textarea:focus { outline: none; border-color: #c9d0d7; }
+  .cur { background: #fafbfc; }
+  .fmts { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 2px; }
+  .fmt {
+    padding: 5px 10px; border: 1px solid #e4e8ec; border-radius: 999px;
+    background: #fff; font: inherit; font-size: 11.5px; font-weight: 600;
+    color: #6f6f6f; cursor: pointer;
+  }
+  .fmt:hover { border-color: #c9d0d7; color: #10141a; }
+  .fmt.on { background: #10141a; border-color: #10141a; color: #fff; }
+  .entries { display: flex; gap: 4px; margin: 10px 0 2px; }
+  .entry {
+    width: 26px; height: 24px; border: 1px solid #e4e8ec; border-radius: 6px;
+    background: #fff; font: inherit; font-size: 11.5px; font-weight: 600; color: #6f6f6f; cursor: pointer;
+  }
+  .entry.on { background: #10141a; border-color: #10141a; color: #fff; }
+  .row { display: flex; gap: 7px; margin-top: 9px; }
+  input.txt {
+    width: 100%; padding: 6px 9px; border: 1px solid #e4e8ec; border-radius: 7px;
+    font: inherit; font-size: 12px;
+  }
+  input.txt:focus { outline: none; border-color: #c9d0d7; }
+  .pts { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 2px; }
+  .req { color: #10141a; }
+  .picks { margin-top: 4px; max-height: 46vh; min-height: 140px; overflow-y: auto;
+           border: 1px solid #e4e8ec; border-radius: 8px; }
+  .pgroup { padding: 6px 9px 2px; font-size: 10.5px; font-weight: 700; color: #6f6f6f;
+            text-transform: uppercase; letter-spacing: .03em; background: #fafbfc;
+            border-top: 1px solid #eef1f4; position: sticky; top: 0; }
+  .pgroup:first-child { border-top: 0; }
+  .pick { display: flex; align-items: flex-start; gap: 7px; padding: 6px 9px; cursor: pointer; }
+  .pick:hover { background: #fafbfc; }
+  .pick input[type=checkbox] { margin: 2px 0 0; flex: none; }
+  .pick .pname { flex: 1; font-size: 12px; line-height: 1.35; }
+  .pick .pissuer { display: block; font-size: 10.5px; color: #9aa0a6; }
+  .pick .tag { margin-left: 4px; padding: 0 5px; border-radius: 999px; background: #f2f4f7; font-size: 10px; color: #6f6f6f; }
+  .pempty { padding: 10px; font-size: 11.5px; color: #9aa0a6; }
+  .status { align-self: center; font-size: 11px; color: #6f6f6f; }
+  .ctrl { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .ctrl > label { margin: 0; flex: none; min-width: 46px; }
+  .ctrl .fmts { margin: 0; }
+  select.sel {
+    padding: 5px 8px; border: 1px solid #e4e8ec; border-radius: 7px;
+    font: inherit; font-size: 11.5px; font-weight: 600; color: #10141a; background: #fff;
+  }
+  select.sel:focus { outline: none; border-color: #c9d0d7; }
+  .foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .foot .status { margin-left: auto; }
+
+  button.act {
+    padding: 7px 13px; border: 1px solid #10141a; border-radius: 7px; background: #10141a;
+    font: inherit; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer;
+  }
+  button.act:disabled { opacity: .45; cursor: default; }
+  button.ghost {
+    padding: 7px 11px; border: 1px solid #e4e8ec; border-radius: 7px; background: #fff;
+    font: inherit; font-size: 12px; font-weight: 600; color: #10141a; cursor: pointer;
+  }
+  button.ghost:disabled { opacity: .45; cursor: default; }
+  .hint { margin-top: 6px; font-size: 10.5px; line-height: 1.4; color: #9aa0a6; }
+  button.linky { float: right; padding: 0; border: 0; background: none; font: inherit;
+                 font-size: 10.5px; font-weight: 500; color: #9aa0a6; text-decoration: underline;
+                 cursor: pointer; }
+  button.linky:hover { color: #10141a; }
+  .err { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #e4e8ec;
+         border-left: 3px solid #10141a; border-radius: 7px; background: #f7f8fa; font-size: 12px; }
+  .draft { margin-top: 10px; border: 1px solid #e4e8ec; border-radius: 8px; overflow: hidden; }
+  .draft .bar { display: flex; justify-content: space-between; align-items: center;
+                padding: 6px 9px; background: #fafbfc; border-bottom: 1px solid #e4e8ec;
+                font-size: 11px; font-weight: 600; color: #6f6f6f; }
+  .draft textarea { border: 0; border-radius: 0; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <h1>Cubic AI</h1>
+    <p class="sub" id="sub">Reads the open section from the document.</p>
+    <div class="toolrow">
+      <button id="fmt" class="ghost" title="Times New Roman throughout, headings bold 12pt, body 10pt">Format document</button>
+      <span id="fmtnote" class="status"></span>
+    </div>
+    <div id="err" class="err" style="display:none"></div>
+  </div>
+  <div id="scroll"><div id="list"></div></div>
+
+<script>
+(function () {
+  // The cookie cannot reach us here: this iframe sits inside a page served by
+  // the Document Server, so the browser treats our SameSite=Lax session cookie
+  // as third-party and withholds it. The editor config hands us a scoped bearer
+  // token in the URL instead.
+  // Substituted when this file is served; empty when opened outside the editor.
+  var TOKEN = "__TOKEN__".indexOf("__") === 0 ? "" : "__TOKEN__";
+  function authHeaders(extra) {
+    var h = extra || {};
+    if (TOKEN) h["Authorization"] = "Bearer " + TOKEN;
+    return h;
+  }
+
+  var state = {
+    sections: [], open: "summary", entry: {}, fmt: {}, prompt: {}, current: {}, draft: {}, busy: "",
+    // Role sections, per entry slot.
+    company: {}, position: {}, timeline: {}, points: {},
+    // Pick-list sections (certifications).
+    picked: {}, pickFilter: "", pickOther: "", certStatus: "", certLoading: false,
+    // Education builder: three slots, one layout for the section.
+    eduText: "", eduFormat: "dash", eduStatus: "", eduLoading: false,
+    // Tech stack: the tools as they stand, plus how they are worded.
+    techText: "", techVariant: 0, techLayout: "grouped", techBullet: "",
+    techStatus: "", techLoading: false, techIdeas: [], techAsking: false
+  };
+  // Mirrors MIN_POINTS / MAX_POINTS / DEFAULT_POINTS in backend/src/ai.rs.
+  var MIN_POINTS = 10, MAX_POINTS = 18, DEFAULT_POINTS = 12;
+  var list = document.getElementById("list");
+  var errBox = document.getElementById("err");
+
+  function fail(msg) {
+    errBox.textContent = msg;
+    errBox.style.display = msg ? "" : "none";
+  }
+  /** Prompt + current text: shared across formats — same content, new shape. */
+  function slot(s) { return s.entries > 1 ? s.id + ":" + (state.entry[s.id] || 1) : s.id; }
+  function pointsOf(k) { return state.points[k] || DEFAULT_POINTS; }
+  /** A role drafts from its details alone; every other section needs a prompt. */
+  function ready(s, k) {
+    if (s.role) {
+      return !!((state.company[k] || "").trim() && (state.position[k] || "").trim() &&
+                (state.timeline[k] || "").trim());
+    }
+    return !!(state.prompt[k] || "").trim();
+  }
+  function fmtOf(s) {
+    return (s.formats && s.formats.length) ? (state.fmt[s.id] || s.formats[0].id) : "";
+  }
+  /** Drafts: per format, so each shape keeps its own result. */
+  function dkey(s) {
+    var f = fmtOf(s);
+    return f ? slot(s) + "|" + f : slot(s);
+  }
+
+  function render() {
+    list.innerHTML = "";
+    state.sections.forEach(function (s) {
+      var open = state.open === s.id, k = slot(s), dk = dkey(s);
+      var sec = document.createElement("div");
+      sec.className = "sec" + (open ? " open" : "");
+
+      var head = document.createElement("button");
+      head.className = "head";
+      head.innerHTML = '<span class="name"></span>' +
+        (s.entries > 1 ? '<span class="count">' + s.entries + "</span>" : "") +
+        '<span class="chev">' + (open ? "−" : "+") + "</span>";
+      head.querySelector(".name").textContent = s.label;
+      head.onclick = function () {
+        state.open = open ? "" : s.id;
+        render();
+        // Opening a section pulls its current text out of the document.
+        if (state.open === s.id) loadFromDoc(s, false);
+      };
+      sec.appendChild(head);
+
+      if (open) {
+        var body = document.createElement("div");
+        body.className = "body";
+
+        if (s.formats && s.formats.length) {
+          body.appendChild(mkLabel("Format", false));
+          var fmts = document.createElement("div");
+          fmts.className = "fmts";
+          s.formats.forEach(function (f) {
+            var b = document.createElement("button");
+            var on = (state.fmt[s.id] || s.formats[0].id) === f.id;
+            b.className = "fmt" + (on ? " on" : "");
+            b.textContent = f.label;
+            b.title = f.guidance;
+            b.onclick = function () {
+              if (state.fmt[s.id] === f.id) return;
+              state.fmt[s.id] = f.id;
+              render();
+              // Selecting a shape should just produce that shape — no second
+              // click. Only when there is something to redraft, and never while
+              // a request is already in flight.
+              var ik = slot(s);
+              if (ready(s, ik) && !state.busy) draft(s, ik);
+            };
+            fmts.appendChild(b);
+          });
+          body.appendChild(fmts);
+        }
+
+        if (s.entries > 1) {
+          var tabs = document.createElement("div");
+          tabs.className = "entries";
+          for (var n = 1; n <= s.entries; n++) {
+            (function (n) {
+              var b = document.createElement("button");
+              b.className = "entry" + ((state.entry[s.id] || 1) === n ? " on" : "");
+              b.textContent = n;
+              var co = (state.company[s.id + ":" + n] || "").trim();
+              if (co) b.title = co;
+              b.onclick = function () { state.entry[s.id] = n; render(); loadFromDoc(s, false); };
+              tabs.appendChild(b);
+            })(n);
+          }
+          body.appendChild(tabs);
+        }
+
+        if (s.role) {
+          [["company", "Company name", "e.g. Capital One"],
+           ["position", "Position", "e.g. Senior Data Engineer"],
+           ["timeline", "Timeline", "e.g. Mar 2021 – Present"]].forEach(function (f) {
+            body.appendChild(mkLabel(f[1], false));
+            var inp = mkInput(state[f[0]][k] || "", f[2]);
+            inp.oninput = function () {
+              state[f[0]][k] = inp.value;
+              if (f[0] === "company") {
+                var tab = list.querySelector(".sec.open .entry.on");
+                if (tab) tab.title = inp.value.trim();
+              }
+              refreshButtons();
+            };
+            body.appendChild(inp);
+          });
+
+          body.appendChild(mkLabel("Number of points", false));
+          var pts = document.createElement("div");
+          pts.className = "pts";
+          for (var c = MIN_POINTS; c <= MAX_POINTS; c++) {
+            (function (c) {
+              var b = document.createElement("button");
+              b.className = "entry" + (pointsOf(k) === c ? " on" : "");
+              b.textContent = c;
+              b.onclick = function () { state.points[k] = c; render(); };
+              pts.appendChild(b);
+            })(c);
+          }
+          body.appendChild(pts);
+        }
+
+        if (s.choices && s.choices.length) {
+          renderPicker(s, body);
+        }
+        if (s.id === "tech_stack") {
+          renderTech(body);
+          sec.appendChild(body);
+          list.appendChild(sec);
+          return;
+        }
+        if (s.id === "education") {
+          renderEducation(body);
+          sec.appendChild(body);
+          list.appendChild(sec);
+          return;
+        }
+
+        var curLabel = mkLabel(s.role ? "Current bullets" : "Current text", true);
+        var reload = document.createElement("button");
+        reload.className = "linky";
+        reload.textContent = "reload from document";
+        reload.title = "Read this section out of the document again, replacing what is here";
+        reload.onclick = function () { loadFromDoc(s, true); };
+        curLabel.appendChild(reload);
+        body.appendChild(curLabel);
+        var cur = mkArea(state.current[k] || "",
+          s.role ? "Read from the document when you open this role — edit if needed."
+                 : "Read from the document when you open this section — edit if needed.", 3, "cur");
+        cur.oninput = function () { state.current[k] = cur.value; };
+        body.appendChild(cur);
+
+        body.appendChild(mkLabel(s.role ? "Anything to emphasise?" : "What should change?", s.role));
+        var pr = mkArea(state.prompt[k] || "",
+          s.role ? "e.g. focus on Spark, Kafka and AWS cost savings"
+                 : "e.g. rewrite for a senior AWS data engineer role", s.role ? 2 : 3, "");
+        pr.oninput = function () { state.prompt[k] = pr.value; refreshButtons(); };
+        body.appendChild(pr);
+
+        var row = document.createElement("div");
+        row.className = "row";
+        var run = document.createElement("button");
+        run.className = "act";
+        run.textContent = state.busy === dk ? "Drafting…" : (s.role ? "Generate " + pointsOf(k) + " points" : "Draft");
+        run.disabled = state.busy === dk || !ready(s, k);
+        run.onclick = function () { draft(s, k); };
+        row.appendChild(run);
+
+        var ins = document.createElement("button");
+        ins.className = "ghost";
+        ins.textContent = "Insert at cursor";
+        ins.disabled = !state.draft[dk];
+        ins.onclick = function () { insert(state.draft[dk]); };
+        row.appendChild(ins);
+        body.appendChild(row);
+
+        var hint = document.createElement("p");
+        hint.className = "hint";
+        hint.textContent = (function () {
+          if (s.role) {
+            return ready(s, k)
+              ? "Each point: action verb + what was built + tech + scale + measurable impact."
+              : s.guidance;
+          }
+          if (!s.formats || !s.formats.length) return s.guidance;
+          var id = state.fmt[s.id] || s.formats[0].id;
+          for (var i = 0; i < s.formats.length; i++) {
+            if (s.formats[i].id === id) return s.formats[i].guidance;
+          }
+          return s.guidance;
+        })();
+        body.appendChild(hint);
+
+        if (state.draft[dk] || state.busy === dk) {
+          var wrap = document.createElement("div");
+          wrap.className = "draft";
+          wrap.innerHTML = '<div class="bar"><span>' +
+            (state.busy === dk ? "Drafting…" : "Draft") + "</span><span></span></div>";
+          if (s.role && state.busy !== dk && state.draft[dk]) {
+            var got = state.draft[dk].split("\n").filter(function (l) { return l.trim(); }).length;
+            wrap.querySelector(".bar span:last-child").textContent =
+              got + " of " + pointsOf(k) + " points" + (got < pointsOf(k) ? " — draft again for more" : "");
+          }
+          var cur = state.draft[dk] || "";
+          var d = mkArea(cur, "", Math.min(14, Math.max(4, cur.split("\n").length + 1)), "");
+          d.oninput = function () { state.draft[dk] = d.value; };
+          wrap.appendChild(d);
+          body.appendChild(wrap);
+        }
+        sec.appendChild(body);
+      }
+      list.appendChild(sec);
+    });
+  }
+
+  function mkLabel(text, optional) {
+    var l = document.createElement("label");
+    l.textContent = text;
+    if (optional) { var s = document.createElement("span"); s.className = "opt"; s.textContent = " optional"; l.appendChild(s); }
+    return l;
+  }
+  /** Checkbox list grouped by provider, with an optional year per pick. */
+  function renderPicker(s, body) {
+    var picker = {};
+    body.appendChild(mkLabel("Select certifications", false));
+    var filter = mkInput(state.pickFilter, "Search, e.g. AWS, Databricks, Kafka");
+    body.appendChild(filter);
+
+    var box = document.createElement("div");
+    box.className = "picks";
+    body.appendChild(box);
+
+    var other = null;
+    function selectedLines() {
+      // The resume lists the certification, not who issues it.
+      var lines = s.choices
+        .filter(function (c) { return state.picked[c.id]; })
+        .map(function (c) { return c.name; });
+      (state.pickOther || "").split("\n").forEach(function (l) {
+        if (l.trim()) lines.push(l.trim());
+      });
+      return lines;
+    }
+    function syncButtons() {
+      clr.disabled = !selectedLines().length;
+    }
+
+    // Filtering redraws only the list, so the search box keeps focus.
+    function drawList() {
+      // Keep the scroll position: ticking an entry redraws the list.
+      var scroll = box.scrollTop;
+      box.innerHTML = "";
+      var q = state.pickFilter.trim().toLowerCase();
+      var lastGroup = "";
+      var shown = 0;
+      s.choices.forEach(function (c) {
+        var hay = (c.name + " " + c.issuer + " " + c.group).toLowerCase();
+        if (q && hay.indexOf(q) === -1) return;
+        if (c.group !== lastGroup) {
+          var g = document.createElement("div");
+          g.className = "pgroup";
+          g.textContent = c.group;
+          box.appendChild(g);
+          lastGroup = c.group;
+        }
+        shown++;
+        var row = document.createElement("label");
+        row.className = "pick";
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = !!state.picked[c.id];
+        var text = document.createElement("span");
+        text.className = "pname";
+        text.textContent = c.name;
+        if (c.retired) {
+          var tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = "retired";
+          tag.title = "No longer offered — only list it if the candidate already holds it.";
+          text.appendChild(tag);
+        }
+        var issuer = document.createElement("span");
+        issuer.className = "pissuer";
+        issuer.textContent = c.issuer;
+        text.appendChild(issuer);
+        row.appendChild(cb);
+        row.appendChild(text);
+        cb.onchange = function () {
+          state.picked[c.id] = cb.checked;
+          syncButtons();
+          picker.apply();
+        };
+        box.appendChild(row);
+      });
+      if (!shown) {
+        var empty = document.createElement("div");
+        empty.className = "pempty";
+        empty.textContent = "No match. Add it under \u201cNot in the list\u201d below.";
+        box.appendChild(empty);
+      }
+      box.scrollTop = scroll;
+    }
+    filter.oninput = function () { state.pickFilter = filter.value; drawList(); };
+
+    body.appendChild(mkLabel("Not in the list", true));
+    other = mkArea(state.pickOther, "One per line, e.g. Cloudera Data Platform Generalist", 2, "");
+    other.oninput = function () { state.pickOther = other.value; syncButtons(); picker.apply(); };
+    body.appendChild(other);
+
+    var row = document.createElement("div");
+    row.className = "row";
+    var status = document.createElement("span");
+    status.className = "status";
+    status.id = "certstatus";
+    status.textContent = state.certStatus;
+    var clr = document.createElement("button");
+    clr.className = "ghost";
+    clr.textContent = "Untick all";
+    clr.onclick = function () {
+      state.picked = {}; state.pickOther = "";
+      render();
+      applyCerts();
+    };
+    row.appendChild(clr);
+    row.appendChild(status);
+    body.appendChild(row);
+
+    /**
+     * Writes the ticked list into the document's Certifications section.
+     *
+     * Ticking is the action — there is no save button — so changes are held
+     * briefly and written once, rather than once per click.
+     */
+    function applyCerts() {
+      if (state.certLoading) return;
+      clearTimeout(applyCerts.timer);
+      applyCerts.timer = setTimeout(function () {
+        var lines = selectedLines();
+        if (!lines.length) {
+          setStatus("Nothing ticked — the resume is unchanged.");
+          return;
+        }
+        setStatus("Writing to the resume\u2026");
+        queueWrite(function (finished) {
+          replaceSection(CERT_HEADINGS, lines, function () {
+            setStatus(lines.length + " in the resume \u2713");
+            finished();
+          }, function () {
+            setStatus("Not written — see the message above.");
+            finished();
+          });
+        });
+      }, 400);
+    }
+    function setStatus(text) {
+      state.certStatus = text;
+      // Look the node up each time: a re-render replaces the one captured here.
+      var live = document.getElementById("certstatus");
+      if (live) live.textContent = text;
+    }
+    picker.apply = applyCerts;
+
+    drawList();
+    syncButtons();
+  }
+
+  /**
+   * Education builder: degree and university per slot, location optional, no
+   * graduation year. Typing writes the section itself — same as ticking a
+   * certification — once a slot names both a degree and a school.
+   */
+  /**
+   * Tech stack arranger: the same tools, regrouped and re-worded for an ATS.
+   * Nothing is added or removed — Rephrase only changes the group headings and
+   * the grouping, so every keyword a parser looks for stays put.
+   */
+  function renderTech(body) {
+    var tools = parseTools(String(state.techText || "").split("\n"));
+
+    // One row of controls, not two stacks of chips.
+    var layoutRow = document.createElement("div");
+    layoutRow.className = "ctrl";
+    layoutRow.appendChild(mkLabel("Layout", false));
+    var fmts = document.createElement("div");
+    fmts.className = "fmts";
+    [["Grouped", "grouped"], ["One line", "flat"], ["Table", "table"]].forEach(function (opt) {
+      var b = document.createElement("button");
+      b.className = "fmt" + (state.techLayout === opt[1] ? " on" : "");
+      b.textContent = opt[0];
+      if (opt[1] === "table") b.title = "Two columns. Some applicant tracking systems read tables poorly.";
+      b.onclick = function () {
+        if (state.techLayout === opt[1]) return;
+        state.techLayout = opt[1];
+        render();
+        applyTech(true);
+      };
+      fmts.appendChild(b);
+    });
+    layoutRow.appendChild(fmts);
+    body.appendChild(layoutRow);
+
+    if (state.techLayout !== "table") {
+      var bulletRow = document.createElement("div");
+      bulletRow.className = "ctrl";
+      bulletRow.appendChild(mkLabel("Bullet", false));
+      var sel = document.createElement("select");
+      sel.className = "sel";
+      TECH_BULLETS.forEach(function (bu) {
+        var o = document.createElement("option");
+        o.value = bu.id;
+        o.textContent = bu.label;
+        if (state.techBullet === bu.id) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.onchange = function () {
+        state.techBullet = sel.value;
+        applyTech(true);
+      };
+      bulletRow.appendChild(sel);
+      body.appendChild(bulletRow);
+    }
+
+    var label = mkLabel("Skills", false);
+    var reload = document.createElement("button");
+    reload.className = "linky";
+    reload.textContent = "reload from document";
+    reload.onclick = function () {
+      var section = state.sections.filter(function (x) { return x.id === "tech_stack"; })[0];
+      if (section) loadFromDoc(section, true);
+    };
+    label.appendChild(reload);
+    body.appendChild(label);
+
+    var box = mkArea(
+      state.techText,
+      "Python, SQL, Spark, Kafka, Airflow, Snowflake, AWS, dbt, Docker",
+      3,
+      ""
+    );
+    box.oninput = function () {
+      state.techText = box.value;
+      applyTech(false);
+    };
+    body.appendChild(box);
+
+    var foot = document.createElement("div");
+    foot.className = "foot";
+    var again = document.createElement("button");
+    again.className = "act";
+    again.textContent = "Rephrase";
+    again.title = "Same tools, different group headings";
+    again.disabled = !tools.length;
+    again.onclick = function () {
+      state.techVariant = (state.techVariant + 1) % 3;
+      render();
+      applyTech(true);
+    };
+    var ask = document.createElement("button");
+    ask.className = "ghost";
+    ask.textContent = state.techAsking ? "Asking\u2026" : "Suggest tools";
+    ask.title = "Ask Claude which tools usually go with this stack";
+    ask.disabled = state.techAsking || !tools.length;
+    ask.onclick = suggestTools;
+    var status = document.createElement("span");
+    status.className = "status";
+    status.id = "techstatus";
+    status.textContent = state.techStatus;
+    foot.appendChild(again);
+    foot.appendChild(ask);
+    foot.appendChild(status);
+    body.appendChild(foot);
+
+    if (state.techIdeas.length) {
+      var ideasLabel = mkLabel("Suggested — add only what the candidate knows", false);
+      var addAll = document.createElement("button");
+      addAll.className = "linky";
+      addAll.textContent = "add all";
+      addAll.onclick = function () { addTools(state.techIdeas.slice()); };
+      ideasLabel.appendChild(addAll);
+      body.appendChild(ideasLabel);
+
+      var ideas = document.createElement("div");
+      ideas.className = "fmts";
+      state.techIdeas.forEach(function (tool) {
+        var b = document.createElement("button");
+        b.className = "fmt";
+        b.textContent = "+ " + tool;
+        b.onclick = function () { addTools([tool]); };
+        ideas.appendChild(b);
+      });
+      body.appendChild(ideas);
+    }
+
+    var note = document.createElement("p");
+    note.className = "hint";
+    note.id = "techpreview";
+    body.appendChild(note);
+    showTechPreview(note);
+  }
+
+  /**
+   * Asks Claude which further tools fit the stack already on the resume.
+   *
+   * The prompt is built here — nothing to type — and the answer is offered as
+   * suggestions rather than written straight in: a resume should only claim
+   * tools the candidate actually knows.
+   */
+  function suggestTools() {
+    var tools = parseTools(String(state.techText || "").split("\n"));
+    if (!tools.length) {
+      setTechStatus("Add a few skills first.");
+      return;
+    }
+    state.techAsking = true;
+    render();
+    setTechStatus("Asking Claude\u2026");
+
+    var prompt =
+      "A data engineer's resume lists these tools: " + tools.join(", ") + ".\n" +
+      "Name up to 12 further tools that a data engineer with this exact stack " +
+      "very often works with and that are missing from the list. Stay in the " +
+      "same ecosystems (cloud provider, processing engine, warehouse) rather " +
+      "than jumping to unrelated vendors. Use the spelling a resume would use. " +
+      "Do not repeat anything already listed.";
+
+    fetch("/api/admin/ai/draft", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({ section: "tech_suggest", prompt: prompt })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j.ok) throw new Error(res.j.error || "Could not reach Claude");
+        var have = {};
+        tools.forEach(function (t) { have[t.toLowerCase()] = true; });
+        var ideas = [];
+        String(res.j.text || "").split(/[,\n;]/).forEach(function (piece) {
+          var tool = piece.replace(/^[\s\-\u2013\u2014*\d.)]+|[\s.]+$/g, "").trim();
+          if (!tool || tool.length > 40 || /\s{2,}/.test(tool)) return;
+          if (tool.split(/\s+/).length > 5) return;   // a sentence, not a tool
+          if (have[tool.toLowerCase()]) return;
+          have[tool.toLowerCase()] = true;
+          ideas.push(tool);
+        });
+        state.techIdeas = ideas.slice(0, 12);
+        state.techAsking = false;
+        render();
+        setTechStatus(state.techIdeas.length
+          ? state.techIdeas.length + " suggested — click to add"
+          : "No new tools suggested.");
+      })
+      .catch(function (e) {
+        state.techAsking = false;
+        render();
+        setTechStatus("");
+        fail(e.message);
+      });
+  }
+
+  /** Adds suggested tools to the skills box and writes the section. */
+  function addTools(list) {
+    var text = String(state.techText || "").trim();
+    state.techText = (text ? text + ", " : "") + list.join(", ");
+    state.techIdeas = state.techIdeas.filter(function (t) { return list.indexOf(t) === -1; });
+    render();
+    applyTech(true);
+  }
+
+  function setTechStatus(text) {
+    state.techStatus = text;
+    var live = document.getElementById("techstatus");
+    if (live) live.textContent = text;
+  }
+
+  function showTechPreview(node) {
+    var el = node || document.getElementById("techpreview");
+    if (!el) return;
+    var tools = parseTools(String(state.techText || "").split("\n"));
+    if (!tools.length) {
+      el.textContent = "Paste the skills above, or reload them from the document.";
+      return;
+    }
+    if (state.techLayout === "table") {
+      el.textContent = tools.length + " tools kept, in a " + techGroups(tools, state.techVariant).length +
+        "-row table. Plain lines read more reliably in applicant tracking systems.";
+      return;
+    }
+    var lines = techLines(tools, state.techVariant, state.techLayout);
+    el.textContent = tools.length + " tools kept, in " + lines.length + " line" +
+      (lines.length === 1 ? "" : "s") + ". Rephrase changes the headings only.";
+  }
+
+  /** Writes the skills section a moment after the last change. */
+  function applyTech(now) {
+    showTechPreview();
+    if (state.techLoading) return;
+    clearTimeout(applyTech.timer);
+    var tools = parseTools(String(state.techText || "").split("\n"));
+    if (!tools.length) {
+      setTechStatus("");
+      return;
+    }
+    var table = state.techLayout === "table";
+    var rows = table ? techGroups(tools, state.techVariant) : [];
+    var lines = table ? [] : techLines(tools, state.techVariant, state.techLayout);
+    applyTech.timer = setTimeout(function () {
+      setTechStatus("Writing to the resume\u2026");
+      queueWrite(function (finished) {
+        var ok = function () {
+          setTechStatus(tools.length + " tools in " +
+            (table ? rows.length + " table rows" : lines.length + " line" + (lines.length === 1 ? "" : "s")) +
+            " \u2713");
+          finished();
+        };
+        var bad = function () {
+          setTechStatus("Not written — see the message above.");
+          finished();
+        };
+        if (table) replaceSectionWithTable(SECTION_ALIASES.tech_stack, rows, ok, bad);
+        else replaceSection(SECTION_ALIASES.tech_stack, lines, ok, bad);
+      });
+    }, now ? 120 : 900);
+  }
+
+  function renderEducation(body) {
+    var layoutRow = document.createElement("div");
+    layoutRow.className = "ctrl";
+    layoutRow.appendChild(mkLabel("Layout", false));
+    var fmts = document.createElement("div");
+    fmts.className = "fmts";
+    EDU_FORMATS.forEach(function (f) {
+      var b = document.createElement("button");
+      b.className = "fmt" + (state.eduFormat === f.id ? " on" : "");
+      b.textContent = f.label;
+      b.onclick = function () {
+        if (state.eduFormat === f.id) return;
+        state.eduFormat = f.id;
+        render();
+        applyEdu(true);
+      };
+      fmts.appendChild(b);
+    });
+    layoutRow.appendChild(fmts);
+    body.appendChild(layoutRow);
+
+    var label = mkLabel("Degree or major", false);
+    var reload = document.createElement("button");
+    reload.className = "linky";
+    reload.textContent = "reload from document";
+    reload.onclick = function () {
+      var section = state.sections.filter(function (x) { return x.id === "education"; })[0];
+      if (section) loadFromDoc(section, true);
+    };
+    label.appendChild(reload);
+    body.appendChild(label);
+
+    // A worked example, spread over lines, so the shape to paste is obvious.
+    var box = mkArea(
+      state.eduText,
+      "Paste it here, one education per line. No year needed.\n\n" +
+        "Master of Science in Data Science, New York University, New York, NY\n" +
+        "Bachelor of Engineering in Computer Science, State University",
+      5,
+      ""
+    );
+    box.oninput = function () {
+      state.eduText = box.value;
+      applyEdu(false);
+    };
+    body.appendChild(box);
+
+    var row = document.createElement("div");
+    row.className = "foot";
+    var status = document.createElement("span");
+    status.className = "status";
+    status.id = "edustatus";
+    status.textContent = state.eduStatus;
+    var clr = document.createElement("button");
+    clr.className = "ghost";
+    clr.textContent = "Clear";
+    clr.onclick = function () {
+      state.eduText = "";
+      render();
+      setEduStatus("Cleared here — the resume is unchanged.");
+    };
+    row.appendChild(clr);
+    row.appendChild(status);
+    body.appendChild(row);
+
+    var preview = document.createElement("p");
+    preview.className = "hint";
+    preview.id = "edupreview";
+    body.appendChild(preview);
+    showEduPreview(preview);
+  }
+
+  function setEduStatus(text) {
+    state.eduStatus = text;
+    var live = document.getElementById("edustatus");
+    if (live) live.textContent = text;
+  }
+
+  function showEduPreview(node) {
+    var el = node || document.getElementById("edupreview");
+    if (!el) return;
+    var lines = eduLines();
+    el.textContent = lines.length
+      ? "Will read: " + lines.map(function (l) { return l.text; }).join("  /  ")
+      : "Paste an education line above and it appears in the resume.";
+  }
+
+  /** Writes the Education section, a moment after typing stops. */
+  function applyEdu(now) {
+    showEduPreview();
+    if (state.eduLoading) return;
+    clearTimeout(applyEdu.timer);
+    var lines = eduLines();
+    if (!lines.length) {
+      setEduStatus("");
+      return;
+    }
+    applyEdu.timer = setTimeout(function () {
+      setEduStatus("Writing to the resume\u2026");
+      queueWrite(function (finished) {
+        replaceSection(SECTION_ALIASES.education, lines, function () {
+          setEduStatus(lines.length + " line" + (lines.length === 1 ? "" : "s") + " in Education \u2713");
+          finished();
+        }, function () {
+          setEduStatus("Not written — see the message above.");
+          finished();
+        });
+      });
+      // Typing pauses are short; wait long enough that half-typed text is not
+      // written as its own entry.
+    }, now ? 120 : 900);
+  }
+
+  function mkInput(value, placeholder) {
+    var t = document.createElement("input");
+    t.type = "text"; t.className = "txt";
+    t.value = value; t.placeholder = placeholder;
+    return t;
+  }
+  function mkArea(value, placeholder, rows, cls) {
+    var t = document.createElement("textarea");
+    t.value = value; t.placeholder = placeholder; t.rows = rows;
+    if (cls) t.className = cls;
+    return t;
+  }
+  function refreshButtons() {
+    var s = state.sections.filter(function (x) { return x.id === state.open; })[0];
+    if (!s) return;
+    var run = list.querySelector(".sec.open .act");
+    if (run) run.disabled = !!state.busy || !ready(s, slot(s));
+    var hint = list.querySelector(".sec.open .hint");
+    if (hint && s.role) {
+      hint.textContent = ready(s, slot(s))
+        ? "Each point: action verb + what was built + tech + scale + measurable impact."
+        : s.guidance;
+    }
+  }
+
+  /**
+   * Streams the draft in as it generates.
+   *
+   * The textarea is updated in place rather than re-rendering the whole panel
+   * per token — a full render would blow away focus and the caret on every
+   * chunk, which arrive tens of times a second.
+   */
+  function draft(s, k) {
+    var dk = dkey(s);
+    state.busy = dk;
+    state.draft[dk] = "";
+    fail("");
+    render();
+
+    var box = list.querySelector(".sec.open .draft textarea");
+    function grow(text) {
+      state.draft[dk] = text;
+      if (!box) { render(); box = list.querySelector(".sec.open .draft textarea"); return; }
+      box.value = text;
+      box.rows = Math.min(14, Math.max(4, text.split("\n").length + 1));
+      box.scrollTop = box.scrollHeight;
+    }
+
+    fetch("/api/admin/ai/draft/stream", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({
+        section: s.id,
+        prompt: (state.prompt[k] || "").trim(),
+        current: state.current[k] || "",
+        entry: s.entries > 1 ? (state.entry[s.id] || 1) : undefined,
+        format: fmtOf(s) || undefined,
+        company: s.role ? (state.company[k] || "").trim() : undefined,
+        position: s.role ? (state.position[k] || "").trim() : undefined,
+        timeline: s.role ? (state.timeline[k] || "").trim() : undefined,
+        points: s.role ? pointsOf(k) : undefined
+      })
+    }).then(function (res) {
+      if (!res.ok) {
+        return res.json().then(function (j) { throw new Error(j.error || "Draft failed"); });
+      }
+      if (!res.body || !res.body.getReader) {
+        // No streaming support in this browser: fall back to the whole body.
+        return res.text().then(function (t) { grow(collapse(t)); finish(); });
+      }
+      var reader = res.body.getReader();
+      var dec = new TextDecoder();
+      var buf = "", text = "";
+
+      function pump() {
+        return reader.read().then(function (r) {
+          if (r.done) { finish(); return; }
+          buf += dec.decode(r.value, { stream: true });
+          // SSE frames are separated by a blank line; hold partials back.
+          var frames = buf.split("\n\n");
+          buf = frames.pop();
+          for (var i = 0; i < frames.length; i++) {
+            var line = frames[i].trim();
+            if (line.indexOf("data:") !== 0) continue;
+            var ev;
+            try { ev = JSON.parse(line.slice(5).trim()); } catch (e) { continue; }
+            if (ev.error) { fail(ev.error); finish(); return; }
+            if (ev.t) { text += ev.t; grow(text); }
+            if (ev.done) { finish(); return; }
+          }
+          return pump();
+        });
+      }
+      return pump();
+    }).catch(function (e) {
+      fail(e.message);
+      finish();
+    });
+
+    function finish() {
+      state.busy = "";
+      // Trim only at the end: trimming mid-stream fights the incoming tokens.
+      if (state.draft[dk]) {
+        state.draft[dk] = s.role
+          ? cleanBullets(state.draft[dk], pointsOf(k))
+          : state.draft[dk].replace(/^\s+|\s+$/g, "");
+      }
+      render();
+    }
+    function collapse(raw) {
+      // Turn a whole SSE body into text, for the no-streaming fallback.
+      var out = "";
+      raw.split("\n\n").forEach(function (f) {
+        f = f.trim();
+        if (f.indexOf("data:") !== 0) return;
+        try { var ev = JSON.parse(f.slice(5).trim()); if (ev.t) out += ev.t; } catch (e) {}
+      });
+      return out;
+    }
+  }
+
+  /** Same cleanup as clean_bullets in backend/src/ai.rs — the stream arrives raw. */
+  function cleanBullets(text, n) {
+    return text.split("\n").map(function (l) {
+      return l.trim()
+        .replace(/^[-*•–·]+/, "")
+        .replace(/^\d+[.)]\s/, "")
+        .trim().replace(/^\*+|\*+$/g, "").trim();
+    }).filter(function (l) { return l && !/:$/.test(l); }).slice(0, n).join("\n");
+  }
+
+  /**
+   * What each section may be called. Resumes arrive on several templates, so
+   * every common wording is listed rather than guessed at.
+   */
+  var SECTION_ALIASES = {
+    summary: [
+      "summary", "professional summary", "career summary", "executive summary",
+      "summary of qualifications", "profile", "professional profile", "career profile",
+      "objective", "career objective", "professional objective",
+      "about", "about me", "overview", "professional overview",
+      "highlights", "career highlights", "key achievements"
+    ],
+    tech_stack: [
+      "technical skills", "tech stack", "skills", "key skills", "core skills",
+      "core competencies", "competencies", "technical expertise", "areas of expertise",
+      "technical proficiencies", "proficiencies", "technologies", "tools and technologies",
+      "technical summary", "skill set", "technology stack", "technical competencies"
+    ],
+    experience: [
+      "professional experience", "work experience", "experience", "employment history",
+      "employment", "work history", "career history", "professional background",
+      "relevant experience", "industry experience", "professional experience and projects"
+    ],
+    certifications: [
+      "certifications", "certification", "certificates", "certificate",
+      "licenses and certifications", "certifications and licenses",
+      "licenses certifications", "certifications licenses", "licenses",
+      "professional certifications", "certifications and training",
+      "certifications and awards", "credentials", "training and certifications"
+    ],
+    education: [
+      "education", "education and training", "educational background",
+      "academic background", "academics", "academic qualifications", "qualifications"
+    ]
+  };
+
+  /** Other headings that simply end a section. */
+  var OTHER_HEADINGS = [
+    "projects", "key projects", "technical projects", "personal projects",
+    "awards", "awards and honors", "honors", "publications", "patents",
+    "languages", "interests", "hobbies", "volunteer experience", "volunteering",
+    "references", "additional information", "professional affiliations",
+    "memberships", "conferences", "courses", "coursework", "activities",
+    "contact", "contact information", "achievements", "accomplishments"
+  ];
+
+  var EXPERIENCE_HEADINGS = SECTION_ALIASES.experience;
+  var CERT_HEADINGS = SECTION_ALIASES.certifications;
+  var SECTION_SOURCES = SECTION_ALIASES;
+
+  /** Every heading this panel recognises — used to find where a section ends. */
+  var ALL_HEADINGS = (function () {
+    var all = OTHER_HEADINGS.slice();
+    for (var key in SECTION_ALIASES) {
+      if (Object.prototype.hasOwnProperty.call(SECTION_ALIASES, key)) {
+        all = all.concat(SECTION_ALIASES[key]);
+      }
+    }
+    return all;
+  })();
+
+  /**
+   * Technical skills, grouped the way an ATS expects to read them.
+   *
+   * Tools are never invented, renamed or dropped — only sorted into groups and
+   * re-labelled, so the exact keywords a parser matches on stay in the resume.
+   * Each group offers three wordings, which is what the Rephrase button cycles.
+   */
+  var TECH_GROUPS = [
+    {
+      labels: ["Languages", "Programming Languages", "Languages & Scripting"],
+      tools: ["python", "sql", "pl/sql", "t-sql", "scala", "java", "r", "bash", "shell", "shell scripting", "go", "golang", "c#", "c++", "javascript", "typescript", "pyspark", "vba"]
+    },
+    {
+      labels: ["Big Data & Processing", "Distributed Processing", "Big Data Engineering"],
+      tools: ["spark", "apache spark", "spark sql", "hadoop", "hive", "mapreduce", "databricks", "emr", "dask", "presto", "trino", "impala", "pig"]
+    },
+    {
+      labels: ["Streaming", "Streaming & Messaging", "Real-Time Data"],
+      tools: ["kafka", "apache kafka", "confluent", "flink", "apache flink", "kinesis", "pub/sub", "event hubs", "spark streaming", "kafka connect", "rabbitmq"]
+    },
+    {
+      labels: ["Cloud Platforms", "Cloud & Infrastructure", "Cloud Services"],
+      tools: ["aws", "azure", "gcp", "google cloud", "s3", "ec2", "lambda", "glue", "athena", "step functions", "cloudwatch", "iam", "dataflow", "dataproc", "cloud composer", "synapse", "azure data factory", "adf", "adls", "microsoft fabric", "fabric", "databricks on azure"]
+    },
+    {
+      labels: ["Data Warehousing", "Warehouses & Lakes", "Data Platforms"],
+      tools: ["snowflake", "redshift", "bigquery", "teradata", "delta lake", "iceberg", "apache iceberg", "hudi", "lakehouse", "data lake", "data warehouse", "netezza", "vertica"]
+    },
+    {
+      labels: ["Databases", "Databases & Storage", "Relational & NoSQL"],
+      tools: ["postgresql", "postgres", "mysql", "sql server", "oracle", "mongodb", "cassandra", "dynamodb", "redis", "neo4j", "elasticsearch", "cosmos db", "db2", "sqlite"]
+    },
+    {
+      labels: ["Orchestration & ETL", "Pipelines & Orchestration", "Data Integration"],
+      tools: ["airflow", "apache airflow", "dbt", "dagster", "prefect", "luigi", "informatica", "talend", "ssis", "nifi", "fivetran", "airbyte", "matillion", "datastage", "etl", "elt"]
+    },
+    {
+      labels: ["BI & Visualization", "Reporting & Analytics", "Business Intelligence"],
+      tools: ["tableau", "power bi", "looker", "qlik", "qlikview", "superset", "excel", "quicksight", "grafana", "ssrs", "ssas"]
+    },
+    {
+      labels: ["DevOps & Tooling", "CI/CD & DevOps", "Engineering Tools"],
+      tools: ["docker", "kubernetes", "k8s", "terraform", "jenkins", "git", "github", "github actions", "gitlab ci", "ci/cd", "linux", "unix", "maven", "ansible", "bitbucket", "jira", "confluence"]
+    },
+    {
+      labels: ["Data Governance & Quality", "Governance & Quality", "Data Quality"],
+      tools: ["great expectations", "unity catalog", "collibra", "alation", "data quality", "data governance", "gdpr", "hipaa", "data lineage", "monte carlo"]
+    },
+    {
+      labels: ["Machine Learning & AI", "ML & AI", "Data Science"],
+      tools: ["mlflow", "tensorflow", "pytorch", "scikit-learn", "sklearn", "pandas", "numpy", "sagemaker", "vertex ai", "azure ml", "llm", "genai", "generative ai", "rag", "langchain", "hugging face"]
+    }
+  ];
+  /** Anything unrecognised keeps its place under a neutral heading. */
+  var TECH_OTHER_LABELS = ["Tools & Technologies", "Additional Tools", "Other Technologies"];
+  /** Line markers. Plain characters, which every resume parser reads. */
+  var TECH_BULLETS = [
+    { id: "", label: "No bullet", mark: "" },
+    { id: "dot", label: "\u2022 Dot", mark: "\u2022 " },
+    { id: "dash", label: "\u2013 Dash", mark: "\u2013 " },
+    { id: "square", label: "\u25aa Square", mark: "\u25aa " }
+  ];
+  function techBulletMark() {
+    for (var i = 0; i < TECH_BULLETS.length; i++) {
+      if (TECH_BULLETS[i].id === state.techBullet) return TECH_BULLETS[i].mark;
+    }
+    return "";
+  }
+
+  /**
+   * Splits a skills section into individual tools, group labels dropped.
+   *
+   * One line often carries several labels ("Languages: Python, SQL; Big Data:
+   * Spark"), so each piece is stripped as well as the line.
+   */
+  function dropLabel(text) {
+    var colon = String(text || "").indexOf(":");
+    if (colon === -1 || colon > 40) return text;
+    var label = text.slice(0, colon).trim();
+    // A label names a category in a few words; "Kafka: Streams" is not one.
+    if (label.split(/\s+/).length > 4) return text;
+    return text.slice(colon + 1);
+  }
+
+  function parseTools(lines) {
+    var seen = {};
+    var out = [];
+    lines.forEach(function (line) {
+      dropLabel(String(line || "")).split(/[,;|\u2022]/).forEach(function (piece) {
+        var tool = dropLabel(piece).replace(/^[\s\-\u2013\u2014*]+|[\s.]+$/g, "").trim();
+        if (!tool || tool.length > 40) return;
+        var key = tool.toLowerCase();
+        if (seen[key]) return;
+        seen[key] = true;
+        out.push(tool);
+      });
+    });
+    return out;
+  }
+
+  /** Which group a tool belongs to, by exact name or by the words in it. */
+  function groupOf(tool) {
+    var key = String(tool || "").toLowerCase().trim();
+    for (var i = 0; i < TECH_GROUPS.length; i++) {
+      if (TECH_GROUPS[i].tools.indexOf(key) !== -1) return i;
+    }
+    for (var j = 0; j < TECH_GROUPS.length; j++) {
+      for (var t = 0; t < TECH_GROUPS[j].tools.length; t++) {
+        var name = TECH_GROUPS[j].tools[t];
+        if (name.length > 3 && key.indexOf(name) !== -1) return j;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * The skills section rewritten: same tools, grouped and labelled.
+   * `variant` picks the wording, `flat` puts everything on one line.
+   */
+  function techGroups(tools, variant) {
+    var buckets = TECH_GROUPS.map(function () { return []; });
+    var other = [];
+    tools.forEach(function (tool) {
+      var g = groupOf(tool);
+      if (g === -1) other.push(tool);
+      else buckets[g].push(tool);
+    });
+    var out = [];
+    buckets.forEach(function (list, i) {
+      if (!list.length) return;
+      var labels = TECH_GROUPS[i].labels;
+      out.push({ label: labels[variant % labels.length], tools: list.join(", ") });
+    });
+    if (other.length) {
+      out.push({
+        label: TECH_OTHER_LABELS[variant % TECH_OTHER_LABELS.length],
+        tools: other.join(", ")
+      });
+    }
+    return out;
+  }
+
+  function techLines(tools, variant, layout) {
+    if (!tools.length) return [];
+    if (layout === "flat") {
+      return [{ text: techBulletMark() + tools.join(", "), before: 0, after: BODY_SPACE_AFTER_PT }];
+    }
+    return techGroups(tools, variant).map(function (g) {
+      return {
+        text: techBulletMark() + g.label + ": " + g.tools,
+        before: 0,
+        after: BODY_SPACE_AFTER_PT
+      };
+    });
+  }
+
+  /**
+   * The ways an education entry can be written. No graduation year: the
+   * degree, the school, and a location only when it is worth naming.
+   */
+  var EDU_FORMATS = [
+    {
+      id: "dash",
+      label: "Degree — School",
+      lines: function (e) {
+        return [e.degree + " \u2014 " + e.university + (e.location ? ", " + e.location : "")];
+      }
+    },
+    {
+      id: "comma",
+      label: "Degree, School",
+      lines: function (e) {
+        return [e.degree + ", " + e.university + (e.location ? ", " + e.location : "")];
+      }
+    },
+    {
+      id: "stacked",
+      label: "School above degree",
+      lines: function (e) {
+        return [e.university + (e.location ? ", " + e.location : ""), e.degree];
+      }
+    },
+    {
+      id: "pipes",
+      label: "School | Degree",
+      lines: function (e) {
+        return [e.university + " | " + e.degree + (e.location ? " | " + e.location : "")];
+      }
+    }
+  ];
+
+  function eduFormat() {
+    for (var i = 0; i < EDU_FORMATS.length; i++) {
+      if (EDU_FORMATS[i].id === state.eduFormat) return EDU_FORMATS[i];
+    }
+    return EDU_FORMATS[0];
+  }
+
+  /**
+   * The pasted education, rewritten in the chosen layout.
+   *
+   * Each entry's own lines sit tight together; one entry is set apart from the
+   * next by a gap, which is what a typeset resume does.
+   */
+  function eduLines() {
+    var fmt = eduFormat();
+    var out = [];
+    parseEducation(String(state.eduText || "").split("\n")).forEach(function (e) {
+      var degree = String(e.degree || "").trim();
+      var university = String(e.university || "").trim();
+      var location = String(e.location || "").trim();
+      var texts;
+      if (degree && university) {
+        texts = fmt.lines({ degree: degree, university: university, location: location });
+      } else if (degree || university || location) {
+        // Something that doesn't split cleanly still belongs in the section.
+        texts = [[degree, university, location].filter(Boolean).join(", ")];
+      } else {
+        return;
+      }
+      var firstEntry = out.length === 0;
+      texts.forEach(function (text, i) {
+        out.push({
+          text: text,
+          before: i === 0 && !firstEntry ? ENTRY_GAP_PT : 0,
+          after: i === texts.length - 1 ? BODY_SPACE_AFTER_PT : 0
+        });
+      });
+    });
+    return out;
+  }
+
+  /** Reads existing education lines back into the slots, as best it can. */
+  function parseEducation(lines) {
+    var SCHOOL = /(university|college|institute|school|academy|polytechnic)/i;
+    var DEGREE = /(bachelor|master|doctor|ph\.?d|b\.?s\.?c?|m\.?s\.?c?|b\.?a|m\.?a|mba|associate|diploma|degree|engineering)/i;
+    var slots = [];
+    var pending = null;
+    lines.forEach(function (raw) {
+      var line = String(raw || "").replace(/\b(19|20)\d{2}\b/g, "").replace(/[\s,|–—-]+$/, "").trim();
+      if (!line) return;
+      var parts = line.split(/\s*[|]\s*|\s+[–—]\s+|,\s*/).map(function (p) { return p.trim(); }).filter(Boolean);
+      var degree = "", university = "", rest = [];
+      parts.forEach(function (p) {
+        if (!university && SCHOOL.test(p)) university = p;
+        else if (!degree && DEGREE.test(p)) degree = p;
+        else rest.push(p);
+      });
+      // Whatever is left is the place — "New York, NY" keeps both halves.
+      var location = rest.join(", ");
+      // "University" on one line, "Degree" on the next.
+      if (pending && ((pending.university && degree && !university) || (pending.degree && university && !degree))) {
+        pending.degree = pending.degree || degree;
+        pending.university = pending.university || university;
+        pending.location = pending.location || location;
+        slots.push(pending);
+        pending = null;
+        return;
+      }
+      if (degree && university) slots.push({ degree: degree, university: university, location: location });
+      else pending = { degree: degree, university: university, location: location };
+    });
+    if (pending && (pending.degree || pending.university)) slots.push(pending);
+    return slots;
+  }
+
+  /** The listed certification a document line refers to, if any. */
+  function matchChoice(choices, line) {
+    var t = normText(line);
+    if (!t) return null;
+    // Longest name first: "SnowPro Advanced: Data Engineer" must beat "SnowPro".
+    var byLength = choices.slice().sort(function (a, b) { return b.name.length - a.name.length; });
+    for (var i = 0; i < byLength.length; i++) {
+      var name = normText(byLength[i].name);
+      if (name && t.indexOf(name) !== -1) return byLength[i];
+    }
+    return null;
+  }
+
+  /** The house style for a resume. Sizes are points. */
+  var DOC_FONT = "Times New Roman";
+  var HEADING_PT = 12;
+  var BODY_PT = 10;
+  // Spacing in points: a clear gap above each section heading, a small one
+  // between lines, so the page keeps its rhythm as content is added.
+  var HEADING_SPACE_BEFORE_PT = 10;
+  var HEADING_SPACE_AFTER_PT = 4;
+  var BODY_SPACE_AFTER_PT = 2;
+  // Education: lines of one entry sit together, entries are set apart.
+  var ENTRY_GAP_PT = 6;
+
+  /**
+   * Puts the whole document into the house style: Times New Roman throughout,
+   * section headings bold at 12pt, everything else 10pt.
+   *
+   * Bold is only ever turned on — a heading is made bold, but bold inside a
+   * body line ("Technologies Used:") is left as the writer set it. Paragraph
+   * spacing is set here too, so sections stay evenly apart however much text
+   * each one holds.
+   */
+  function formatDocument(done, onFail) {
+    if (!window.Asc || !window.Asc.plugin || !window.Asc.plugin.callCommand) {
+      onFail("Open this document from Cubic so the panel can format it.");
+      return;
+    }
+    Asc.scope.stops = ALL_HEADINGS;
+    Asc.scope.font = DOC_FONT;
+    Asc.scope.headingPt = HEADING_PT;
+    Asc.scope.bodyPt = BODY_PT;
+    Asc.scope.space = {
+      headBefore: HEADING_SPACE_BEFORE_PT,
+      headAfter: HEADING_SPACE_AFTER_PT,
+      bodyAfter: BODY_SPACE_AFTER_PT
+    };
+    window.Asc.plugin.callCommand(function () {
+      var stops = Asc.scope.stops, font = Asc.scope.font, space = Asc.scope.space;
+      // The builder measures type in half-points and spacing in twentieths.
+      var headingHalf = Asc.scope.headingPt * 2, bodyHalf = Asc.scope.bodyPt * 2;
+      var pt = function (n) { return Math.round(n * 20); };
+      function setSpacing(el, before, after) {
+        try {
+          // Word's "don't add space between paragraphs of the same style"
+          // cancels these gaps wherever consecutive lines share a style, which
+          // is exactly what a resume section is. Turn it off first.
+          if (el.SetContextualSpacing) el.SetContextualSpacing(false);
+          if (el.SetSpacingBefore) el.SetSpacingBefore(pt(before));
+          if (el.SetSpacingAfter) el.SetSpacingAfter(pt(after));
+          if (el.SetSpacingLine) el.SetSpacingLine(240, "auto");
+        } catch (e) {}
+      }
+      function norm(t) {
+        var text = String(t || "")
+          .replace(/^[\s\u2022\u25aa\u25cf\u25a0\-–—*#.\d)\]]+/, " ")
+          .replace(/&/g, " and ")
+          .toLowerCase().replace(/[^a-z]+/g, " ").trim();
+        if (text && text.split(" ").every(function (w) { return w.length === 1; })) {
+          text = text.replace(/ /g, "");
+        }
+        return text;
+      }
+      try {
+        var doc = Api.GetDocument();
+        var headings = 0, body = 0, first = true;
+        for (var i = 0; i < doc.GetElementsCount(); i++) {
+          var el = doc.GetElement(i);
+          if (!el || !el.SetFontFamily) continue;
+          var raw = "";
+          try { raw = el.GetText ? el.GetText() : ""; } catch (e) { raw = ""; }
+          if (!String(raw).trim()) continue;
+          var trimmed = String(raw).trim();
+          var t = norm(trimmed.replace(/[:\u2013\u2014-]+\s*$/, ""));
+          var isHead = false;
+          if (t && t.split(" ").length <= 5 && !/[.;,!?]\s*$/.test(trimmed) && !/:.*\S/.test(trimmed)) {
+            for (var w = 0; w < stops.length; w++) {
+              if (t === stops[w]) { isHead = true; break; }
+              if (t.indexOf(stops[w] + " ") === 0 &&
+                  t.split(" ").length <= stops[w].split(" ").length + 2) { isHead = true; break; }
+            }
+          }
+          el.SetFontFamily(font);
+          // The name at the top keeps its own size; only the typeface changes.
+          if (first) { first = false; continue; }
+          if (isHead) {
+            el.SetFontSize(headingHalf);
+            if (el.SetBold) el.SetBold(true);
+            // No gap above the first heading: it sits under the name already.
+            setSpacing(el, headings === 0 ? space.headAfter : space.headBefore, space.headAfter);
+            headings++;
+          } else {
+            el.SetFontSize(bodyHalf);
+            setSpacing(el, 0, space.bodyAfter);
+            body++;
+          }
+        }
+        return { ok: true, headings: headings, body: body };
+      } catch (err) {
+        return { ok: false, message: String(err) };
+      }
+    }, false, true, function (res) {
+      if (!res || !res.ok) {
+        onFail("Could not format the document" + (res && res.message ? ": " + res.message : "."));
+        return;
+      }
+      done(res);
+    });
+  }
+
+  /** Every paragraph of the document, in order. */
+  function snapshotDoc(done) {
+    if (!window.Asc || !window.Asc.plugin || !window.Asc.plugin.callCommand) {
+      done(null);
+      return;
+    }
+    window.Asc.plugin.callCommand(function () {
+      try {
+        var doc = Api.GetDocument();
+        var out = [];
+        for (var i = 0; i < doc.GetElementsCount(); i++) {
+          var el = doc.GetElement(i);
+          var text = "";
+          if (el && el.GetText) {
+            try { text = el.GetText(); } catch (e) { text = ""; }
+          }
+          out.push(String(text || ""));
+        }
+        return out;
+      } catch (err) {
+        return null;
+      }
+    }, false, true, function (res) { done(res && res.length ? res : null); });
+  }
+
+  /**
+   * A line reduced to comparable words: leading bullets/numbers dropped, "&"
+   * read as "and", and letter-spaced headings ("C E R T I F I C A T I O N S")
+   * pulled back together.
+   */
+  function normText(t) {
+    var text = String(t || "")
+      .replace(/^[\s\u2022\u25aa\u25cf\u25a0\-–—*#.\d)\]]+/, " ")
+      .replace(/&/g, " and ")
+      .toLowerCase()
+      .replace(/[^a-z]+/g, " ")
+      .trim();
+    if (text && text.split(" ").every(function (w) { return w.length === 1; })) {
+      text = text.replace(/ /g, "");
+    }
+    return text;
+  }
+
+  /** "Certifications:" and "CERTIFICATIONS" are the same heading. */
+  function headingKey(raw) {
+    var text = String(raw || "").trim().replace(/[:\u2013\u2014-]+\s*$/, "");
+    return normText(text);
+  }
+
+  /**
+   * True when a line is the heading of one of `names` — not a sentence about
+   * it. A heading is short, carries no sentence punctuation (a trailing colon
+   * is fine) and reads as the section's name.
+   */
+  function isHeading(raw, names) {
+    var text = String(raw || "").trim();
+    if (!text || /[.;,!?]\s*$/.test(text)) return false;
+    // "Languages: Python, SQL" labels content; only a trailing colon is a heading's.
+    if (/:.*\S/.test(text)) return false;
+    var t = headingKey(text);
+    if (!t || t.split(" ").length > 5) return false;
+    for (var i = 0; i < names.length; i++) {
+      var name = names[i];
+      if (t === name) return true;
+      // "Professional Experience & Projects" still opens the experience section.
+      if (t.indexOf(name + " ") === 0 && t.split(" ").length <= name.split(" ").length + 2) return true;
+    }
+    return false;
+  }
+
+  /** True when a line is any section heading — i.e. the end of the one above. */
+  function isAnyHeading(raw) {
+    return isHeading(raw, ALL_HEADINGS);
+  }
+
+  /** The non-empty lines under a heading, up to the next section heading. */
+  function sectionLines(doc, names) {
+    if (!doc) return [];
+    var start = -1;
+    for (var i = 0; i < doc.length && start === -1; i++) {
+      if (isHeading(doc[i], names)) start = i;
+    }
+    if (start === -1) return [];
+    var out = [];
+    for (var j = start + 1; j < doc.length; j++) {
+      if (isAnyHeading(doc[j])) break;
+      if (String(doc[j] || "").trim()) out.push(String(doc[j]).trim());
+    }
+    return out;
+  }
+
+  /** A date range like "Jan 2022 – Present", "2019 - 2021" or "03/2019 – 06/2021". */
+  var DATE_RANGE = /((?:[A-Za-z]{3,9}\.?\s*|\d{1,2}[\/.-])?(?:19|20)\d{2})\s*(?:-|–|—|to|through)\s*((?:[A-Za-z]{3,9}\.?\s*|\d{1,2}[\/.-])?(?:19|20)\d{2}|present|current|now|date)/i;
+  /** Words that mark a line as a job title rather than a company. */
+  var TITLE_WORDS = /(engineer|developer|analyst|architect|scientist|administrator|consultant|manager|director|lead|specialist|programmer|designer|intern|associate|officer|head of)/i;
+
+  /** A line that introduces a role, rather than one of its bullet points. */
+  function looksLikeHeader(line) {
+    var t = String(line || "").trim();
+    if (!t) return false;
+    if (/[.;]\s*$/.test(t)) return false;
+    return t.split(/\s+/).length <= 12;
+  }
+
+  /** Splits a header line into its parts: company, title, location. */
+  function headerParts(line) {
+    return String(line || "")
+      .split(/\s*[|•·]\s*|\s+[–—]\s+|\s+at\s+|\s{2,}|,\s*/i)
+      .map(function (p) { return p.replace(/^[\s,|–—-]+|[\s,|–—-]+$/g, "").trim(); })
+      .filter(function (p) {
+        if (!p) return false;
+        if (/^(remote|hybrid|onsite|on-site|usa|united states)$/i.test(p)) return false;
+        // "TX", "Bentonville AR", "New York, NY" name a place, not a job.
+        if (/^[A-Z]{2}$/.test(p)) return false;
+        if (/\s[A-Z]{2}$/.test(p) && !TITLE_WORDS.test(p)) return false;
+        return true;
+      });
+  }
+
+  /**
+   * Splits an experience section into one block per role.
+   *
+   * Templates differ: the dates may sit on the company line, on the title line
+   * under it, or on their own. The date range anchors each role, and the lines
+   * touching it supply whatever company and title it doesn't already carry.
+   */
+  function roleBlocks(lines) {
+    var anchors = [];
+    for (var i = 0; i < lines.length; i++) {
+      if (DATE_RANGE.test(lines[i])) anchors.push(i);
+    }
+    var roles = [];
+    for (var a = 0; a < anchors.length; a++) {
+      var at = anchors[a];
+      var prevAnchor = a > 0 ? anchors[a - 1] : -1;
+      var nextAnchor = a + 1 < anchors.length ? anchors[a + 1] : lines.length;
+      var timeline = (lines[at].match(DATE_RANGE) || [""])[0].trim();
+      var parts = headerParts(lines[at].replace(timeline, " "));
+
+      // A header line above the dates (company on one line, dates on the next).
+      var usedAbove = -1;
+      if (parts.length < 2 && at - 1 > prevAnchor && looksLikeHeader(lines[at - 1])) {
+        parts = headerParts(lines[at - 1]).concat(parts);
+        usedAbove = at - 1;
+      }
+      // Or below it, which is how several templates place the job title.
+      var usedBelow = -1;
+      if (parts.length < 2 && at + 1 < nextAnchor && looksLikeHeader(lines[at + 1]) &&
+          !DATE_RANGE.test(lines[at + 1])) {
+        parts = parts.concat(headerParts(lines[at + 1]));
+        usedBelow = at + 1;
+      }
+
+      // The part that reads like a job is the title, wherever it sits; the
+      // first of the rest is the employer.
+      var titleAt = -1;
+      for (var t = 0; t < parts.length; t++) {
+        if (TITLE_WORDS.test(parts[t])) { titleAt = t; break; }
+      }
+      var position = titleAt === -1 ? (parts[1] || "") : parts[titleAt];
+      var company = "";
+      for (var c = 0; c < parts.length; c++) {
+        if (c !== titleAt && parts[c] !== position) { company = parts[c]; break; }
+      }
+
+      var bullets = [];
+      for (var b = at + 1; b < nextAnchor; b++) {
+        if (b === usedBelow) continue;
+        var text = String(lines[b] || "").replace(/^[\s\u2022\u25aa\u25cf\u25a0\-–—*]+/, "").trim();
+        if (text) bullets.push(text);
+      }
+      // A company line pulled up from above belongs to this role, not the last.
+      if (usedAbove !== -1 && roles.length) {
+        var last = roles[roles.length - 1];
+        var stolen = String(lines[usedAbove] || "").replace(/^[\s\u2022\u25aa\u25cf\u25a0\-–—*]+/, "").trim();
+        var pos = last.bullets.indexOf(stolen);
+        if (pos !== -1) last.bullets.splice(pos, 1);
+      }
+      roles.push({ header: lines[at], timeline: timeline, company: company, position: position, bullets: bullets });
+    }
+    return roles;
+  }
+
+  /** The headline under the candidate's name: the first line that isn't a heading. */
+  function titleLine(doc) {
+    for (var i = 1; i < Math.min(doc.length, 6); i++) {
+      var line = String(doc[i] || "").trim();
+      if (!line) continue;
+      if (isAnyHeading(line)) return "";
+      return line;
+    }
+    return "";
+  }
+
+  /**
+   * Fills the open section's fields from the document, so nothing has to be
+   * pasted in by hand. Anything already typed is left alone.
+   */
+  function loadFromDoc(s, force) {
+    var k = slot(s);
+    snapshotDoc(function (doc) {
+      if (!doc) {
+        if (force) fail("Open this document from Cubic so the panel can read it.");
+        return;
+      }
+      var changed = false;
+      function setCurrent(text) {
+        // On reload, no text means the section is not in this document: say so
+        // by emptying the box rather than leaving the last resume's words.
+        if (force || (text && !(state.current[k] || "").trim())) {
+          if (state.current[k] !== text) {
+            state.current[k] = text;
+            changed = true;
+          }
+        }
+      }
+      if (s.id === "overall") {
+        setCurrent(doc.filter(function (l) { return String(l).trim(); }).join("\n"));
+      } else if (s.id === "title") {
+        setCurrent(titleLine(doc));
+      } else if (s.role) {
+        var roles = roleBlocks(sectionLines(doc, EXPERIENCE_HEADINGS));
+        var role = roles[(state.entry[s.id] || 1) - 1];
+        if (role) {
+          [["company", role.company], ["position", role.position], ["timeline", role.timeline]].forEach(function (f) {
+            if (f[1] && (force || !(state[f[0]][k] || "").trim())) {
+              state[f[0]][k] = f[1];
+              changed = true;
+            }
+          });
+          setCurrent(role.bullets.join("\n"));
+        }
+      } else if (s.id === "certifications") {
+        var lines = sectionLines(doc, CERT_HEADINGS);
+        setCurrent(lines.join("\n"));
+        // Tick what the resume already lists, so the panel mirrors the document.
+        if (force || !Object.keys(state.picked).length) {
+          state.certLoading = true;
+          state.picked = {};
+          var leftovers = [];
+          lines.forEach(function (line) {
+            var hit = matchChoice(s.choices, line);
+            if (hit) state.picked[hit.id] = true;
+            else leftovers.push(line);
+          });
+          state.pickOther = leftovers.join("\n");
+          state.certStatus = lines.length
+            ? "Showing the " + lines.length + " already in the resume."
+            : "";
+          changed = true;
+          setTimeout(function () { state.certLoading = false; }, 0);
+        }
+      } else if (s.id === "education") {
+        var eduText = sectionLines(doc, SECTION_ALIASES.education).join("\n");
+        setCurrent(eduText);
+        if (force || !String(state.eduText || "").trim()) {
+          state.eduLoading = true;
+          state.eduText = eduText;
+          changed = true;
+          setTimeout(function () { state.eduLoading = false; }, 0);
+        }
+      } else if (s.id === "tech_stack") {
+        var techText = sectionLines(doc, SECTION_ALIASES.tech_stack).join("\n");
+        setCurrent(techText);
+        if (force || !String(state.techText || "").trim()) {
+          state.techLoading = true;
+          state.techText = techText;
+          changed = true;
+          setTimeout(function () { state.techLoading = false; }, 0);
+        }
+      } else if (SECTION_SOURCES[s.id]) {
+        setCurrent(sectionLines(doc, SECTION_SOURCES[s.id]).join("\n"));
+      }
+      if (changed) render();
+    });
+  }
+
+  /**
+   * Replaces everything under a heading with `lines`, one paragraph each.
+   *
+   * Pasting at the cursor put certifications wherever the caret happened to be
+   * (the Summary, in one case). This finds the heading itself, so the lines land
+   * in that section and nothing else stays behind in it.
+   */
+  /**
+   * Only one section write may be in flight. Two overlapping rewrites left the
+   * document half-written — paragraphs added by one pass while the other was
+   * still removing them — which is what broke the Education layout mid-typing.
+   */
+  var writing = false;
+  var writeQueued = null;
+
+  function queueWrite(job) {
+    if (writing) {
+      writeQueued = job;   // only the latest state matters
+      return;
+    }
+    writing = true;
+    job(function () {
+      writing = false;
+      var next = writeQueued;
+      writeQueued = null;
+      if (next) queueWrite(next);
+    });
+  }
+
+  /** Accepts "text" or { text, before, after } and fills in the house defaults. */
+  function asLine(item) {
+    if (typeof item === "string") {
+      return { text: item, before: 0, after: BODY_SPACE_AFTER_PT };
+    }
+    return {
+      text: String(item.text || ""),
+      before: item.before === undefined ? 0 : item.before,
+      after: item.after === undefined ? BODY_SPACE_AFTER_PT : item.after
+    };
+  }
+
+  /**
+   * Writes a section as a two-column table: category on the left, tools on the
+   * right. Everything currently under the heading is cleared first.
+   */
+  function replaceSectionWithTable(match, rows, done, onFail) {
+    if (!window.Asc || !window.Asc.plugin || !window.Asc.plugin.callCommand) {
+      fail("Open this document from Cubic so the panel can write into it.");
+      return;
+    }
+    Asc.scope.want = match;
+    Asc.scope.rows = rows;
+    Asc.scope.stops = ALL_HEADINGS;
+    Asc.scope.font = DOC_FONT;
+    Asc.scope.bodyPt = BODY_PT;
+    window.Asc.plugin.callCommand(function () {
+      var want = Asc.scope.want, rows = Asc.scope.rows, stops = Asc.scope.stops;
+      function norm(t) {
+        var text = String(t || "")
+          .replace(/^[\s\u2022\u25aa\u25cf\u25a0\-–—*#.\d)\]]+/, " ")
+          .replace(/&/g, " and ")
+          .toLowerCase().replace(/[^a-z]+/g, " ").trim();
+        if (text && text.split(" ").every(function (w) { return w.length === 1; })) {
+          text = text.replace(/ /g, "");
+        }
+        return text;
+      }
+      function isHeadingFor(raw, names) {
+        var text = String(raw || "").trim();
+        if (!text || /[.;,!?]\s*$/.test(text)) return false;
+        if (/:.*\S/.test(text)) return false;
+        var t = norm(text.replace(/[:\u2013\u2014-]+\s*$/, ""));
+        if (!t || t.split(" ").length > 5) return false;
+        for (var w = 0; w < names.length; w++) {
+          if (t === names[w]) return true;
+          if (t.indexOf(names[w] + " ") === 0 &&
+              t.split(" ").length <= names[w].split(" ").length + 2) return true;
+        }
+        return false;
+      }
+      try {
+        var doc = Api.GetDocument();
+        var n = doc.GetElementsCount();
+        function textAt(i) {
+          var el = doc.GetElement(i);
+          if (!el || !el.GetText) return "";
+          try { return el.GetText(); } catch (e) { return ""; }
+        }
+        var start = -1;
+        for (var i = 0; i < n && start === -1; i++) {
+          if (isHeadingFor(textAt(i), want)) start = i;
+        }
+        if (start === -1) return { ok: false, reason: "no-heading" };
+        var end = n;
+        for (var j = start + 1; j < n; j++) {
+          if (isHeadingFor(textAt(j), stops)) { end = j; break; }
+        }
+        for (var d = end - 1; d > start; d--) doc.RemoveElement(d);
+
+        var table = Api.CreateTable(2, rows.length);
+        try { table.SetWidth("percent", 100); } catch (e) {}
+        // No rules: a resume table should read as columns, not a spreadsheet.
+        ["SetTableBorderTop", "SetTableBorderBottom", "SetTableBorderLeft",
+         "SetTableBorderRight", "SetTableBorderInsideH", "SetTableBorderInsideV"]
+          .forEach(function (fn) {
+            try { if (table[fn]) table[fn]("none", 0, 0, 255, 255, 255); } catch (e) {}
+          });
+        rows.forEach(function (row, r) {
+          [row.label, row.tools].forEach(function (text, c) {
+            try {
+              var para = table.GetRow(r).GetCell(c).GetContent().GetElement(0);
+              para.AddText(text);
+              if (para.SetFontFamily) para.SetFontFamily(Asc.scope.font);
+              if (para.SetFontSize) para.SetFontSize(Asc.scope.bodyPt * 2);
+              if (c === 0 && para.SetBold) para.SetBold(true);
+            } catch (e) {}
+          });
+        });
+        doc.AddElement(start + 1, table);
+        return { ok: true, rows: rows.length, table: true };
+      } catch (err) {
+        return { ok: false, reason: "error", message: String(err) };
+      }
+    }, false, true, function (res) {
+      if (!res || !res.ok) {
+        var why = res && res.reason === "no-heading"
+          ? "That section has no heading in this document — add one, then try again."
+          : "Could not write the table" + (res && res.message ? ": " + res.message : ".");
+        fail(why);
+        if (onFail) onFail(why);
+        return;
+      }
+      fail("");
+      if (done) done(res);
+    });
+  }
+
+  function replaceSection(match, lines, done, onFail) {
+    if (!window.Asc || !window.Asc.plugin || !window.Asc.plugin.callCommand) {
+      fail("Open this document from Cubic so the panel can write into it.");
+      return;
+    }
+    Asc.scope.want = match;
+    Asc.scope.lines = lines.map(asLine);
+    Asc.scope.stops = ALL_HEADINGS;
+    Asc.scope.font = DOC_FONT;
+    Asc.scope.bodyPt = BODY_PT;
+    Asc.scope.bodyAfterPt = BODY_SPACE_AFTER_PT;
+    window.Asc.plugin.callCommand(function () {
+      var want = Asc.scope.want, lines = Asc.scope.lines, stops = Asc.scope.stops;
+      function norm(t) {
+        var text = String(t || "")
+          .replace(/^[\s\u2022\u25aa\u25cf\u25a0\-–—*#.\d)\]]+/, " ")
+          .replace(/&/g, " and ")
+          .toLowerCase()
+          .replace(/[^a-z]+/g, " ")
+          .trim();
+        if (text && text.split(" ").every(function (w) { return w.length === 1; })) {
+          text = text.replace(/ /g, "");
+        }
+        return text;
+      }
+      function key(raw) {
+        return norm(String(raw || "").trim().replace(/[:\u2013\u2014-]+\s*$/, ""));
+      }
+      try {
+        var doc = Api.GetDocument();
+        var n = doc.GetElementsCount();
+        function textAt(i) {
+          var el = doc.GetElement(i);
+          if (!el || !el.GetText) return "";
+          try { return el.GetText(); } catch (e) { return ""; }
+        }
+        // A heading names its section and nothing else. Sentences that merely
+        // mention the word ("Maintained certification of data quality checks.")
+        // must not be mistaken for one, so require a short line with no
+        // sentence punctuation that begins with the section name.
+        function isHeadingFor(raw, names) {
+          var text = String(raw || "").trim();
+          if (!text || /[.;,!?]\s*$/.test(text)) return false;
+          if (/:.*\S/.test(text)) return false;
+          var t = key(text);
+          if (!t || t.split(" ").length > 5) return false;
+          for (var w = 0; w < names.length; w++) {
+            if (t === names[w]) return true;
+            if (t.indexOf(names[w] + " ") === 0 &&
+                t.split(" ").length <= names[w].split(" ").length + 2) return true;
+          }
+          return false;
+        }
+        var start = -1;
+        for (var i = 0; i < n && start === -1; i++) {
+          if (isHeadingFor(textAt(i), want)) start = i;
+        }
+        if (start === -1) return { ok: false, reason: "no-heading" };
+
+        var end = n;
+        for (var j = start + 1; j < n; j++) {
+          if (isHeadingFor(textAt(j), stops)) { end = j; break; }
+        }
+
+        // Reuse an existing line so bullets, font and spacing carry over.
+        var template = null;
+        for (var k = start + 1; k < end && !template; k++) {
+          var el = doc.GetElement(k);
+          if (el && el.GetClassType && el.GetClassType() === "paragraph" && norm(el.GetText())) {
+            template = el;
+          }
+        }
+        // Rewrite the lines that are already there rather than replacing them.
+        // Deleting and re-inserting paragraphs rebuilt the list from scratch and
+        // lost the section's bullets and indents; editing in place keeps every
+        // property the template applied.
+        function houseStyle(para, line) {
+          try {
+            if (para.SetFontFamily) para.SetFontFamily(Asc.scope.font);
+            if (para.SetFontSize) para.SetFontSize(Asc.scope.bodyPt * 2);
+            // Contextual spacing would swallow the gap between entries whenever
+            // neighbouring lines share a style — off, or the gaps never show.
+            if (para.SetContextualSpacing) para.SetContextualSpacing(false);
+            if (para.SetSpacingBefore) para.SetSpacingBefore(Math.round(line.before * 20));
+            if (para.SetSpacingAfter) para.SetSpacingAfter(Math.round(line.after * 20));
+            if (para.SetSpacingLine) para.SetSpacingLine(240, "auto");
+          } catch (e) {}
+        }
+        function asBullet(para) {
+          try {
+            if (Api.CreateBullet && para.SetBullet) {
+              para.SetBullet(Api.CreateBullet("\u2022"));
+              return "bullet";
+            }
+          } catch (e1) {}
+          try {
+            if (Api.CreateNumbering && para.SetNumbering) {
+              para.SetNumbering(Api.CreateNumbering("bullet").GetLevel(0));
+              return "numbering";
+            }
+          } catch (e2) {}
+          return "plain";
+        }
+        function setText(para, text) {
+          if (para.RemoveAllElements) para.RemoveAllElements();
+          para.AddText(text);
+        }
+
+        // A table from the other layout is not a line: drop it first, so the
+        // section goes back to plain paragraphs cleanly.
+        for (var t = end - 1; t > start; t--) {
+          var maybeTable = doc.GetElement(t);
+          if (maybeTable && !maybeTable.AddText) {
+            doc.RemoveElement(t);
+            end--;
+          }
+        }
+        var rows = [];
+        for (var r = start + 1; r < end; r++) {
+          var el = doc.GetElement(r);
+          if (el && el.AddText) rows.push(r);
+        }
+
+        var reused = 0, added = 0, removed = 0, bulletStyle = "copied";
+        // 1. Existing lines: keep the paragraph, swap the words, and put it on
+        //    the house spacing so a rewritten section keeps an even rhythm.
+        for (var i = 0; i < lines.length && i < rows.length; i++) {
+          var kept = doc.GetElement(rows[i]);
+          setText(kept, lines[i].text);
+          houseStyle(kept, lines[i]);
+          reused++;
+        }
+        // 2. More certifications than lines: clone the last one so the new
+        //    paragraph joins the same list, or make a bullet if there is none.
+        var insertAt = rows.length ? rows[rows.length - 1] + 1 : start + 1;
+        for (var j = rows.length; j < lines.length; j++) {
+          var model = rows.length ? doc.GetElement(rows[rows.length - 1]) : template;
+          var para;
+          if (model && model.Copy) {
+            para = model.Copy();
+            setText(para, lines[j].text);
+            houseStyle(para, lines[j]);
+          } else {
+            para = Api.CreateParagraph();
+            bulletStyle = asBullet(para);
+            para.AddText(lines[j].text);
+            houseStyle(para, lines[j]);
+          }
+          doc.AddElement(insertAt, para);
+          insertAt++;
+          added++;
+        }
+        // 3. Fewer lines than before: drop the surplus from the bottom. One
+        //    styled line always stays, so later additions have something to
+        //    copy their bullet, indent and spacing from.
+        for (var k = rows.length - 1; k >= Math.max(lines.length, 1); k--) {
+          doc.RemoveElement(rows[k]);
+          removed++;
+        }
+        return { ok: true, reused: reused, added: added, removed: removed, bullets: bulletStyle };
+      } catch (err) {
+        return { ok: false, reason: "error", message: String(err) };
+      }
+    }, false, true, function (res) {
+      if (!res || !res.ok) {
+        var why = res && res.reason === "no-heading"
+          ? "That section has no heading in this document — add one, then try again."
+          : "Could not write into the document" + (res && res.message ? ": " + res.message : ".");
+        fail(why);
+        if (onFail) onFail(why);
+        return;
+      }
+      fail("");
+      if (done) done(res);
+    });
+  }
+
+  /**
+   * Drops the text into the document at the cursor, one paragraph per line.
+   *
+   * `PasteText` returns false when the editor is busy with another method, and
+   * silently does nothing outside the editor — so say which happened instead of
+   * leaving the panel looking like it worked.
+   */
+  function insert(text, done) {
+    if (!text) return;
+    if (!window.Asc || !window.Asc.plugin || !window.Asc.plugin.executeMethod) {
+      fail("Open this document from Cubic so the panel can write into it.");
+      return;
+    }
+    var started = window.Asc.plugin.executeMethod("PasteText", [text], function () {
+      fail("");
+      if (done) done();
+    });
+    if (started === false) {
+      fail("The editor is busy — click in the document, then insert again.");
+    }
+  }
+
+  function wireFormatButton() {
+    var btn = document.getElementById("fmt");
+    var note = document.getElementById("fmtnote");
+    btn.onclick = function () {
+      btn.disabled = true;
+      note.textContent = "Formatting\u2026";
+      formatDocument(function (res) {
+        fail("");
+        btn.disabled = false;
+        note.textContent = res.headings + " headings, " + res.body + " lines \u2713";
+      }, function (msg) {
+        btn.disabled = false;
+        note.textContent = "";
+        fail(msg);
+      });
+    };
+  }
+
+  function boot() {
+    fetch("/api/admin/ai/sections", { credentials: "same-origin", headers: authHeaders() })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j.ok) throw new Error(res.j.error || "Could not load sections");
+        state.sections = (res.j.sections || []).filter(function (x) { return !x.hidden; });
+        state.allSections = res.j.sections || [];
+        if (res.j.provider) document.getElementById("sub").textContent =
+          "Reads the open section from the document. · " + res.j.provider;
+        render();
+        // The section that starts open reads itself too.
+        var first = state.sections.filter(function (x) { return x.id === state.open; })[0];
+        if (first) loadFromDoc(first, false);
+      })
+      .catch(function (e) {
+        fail(TOKEN ? e.message : e.message + " — reopen the document from Cubic so the panel gets a token.");
+      });
+  }
+
+  wireFormatButton();
+  if (window.Asc && window.Asc.plugin) {
+    window.Asc.plugin.init = boot;
+    window.Asc.plugin.button = function () { this.executeCommand("close", ""); };
+  } else {
+    // Also usable standalone in a normal tab, which makes it testable.
+    boot();
+  }
+})();
+</script>
+</body>
+</html>

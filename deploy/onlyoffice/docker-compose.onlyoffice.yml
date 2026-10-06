@@ -1,0 +1,54 @@
+# Optional local ONLYOFFICE Docs — mirrors the VPS instance so the resume automation
+# behaves the same in dev as in production.
+#
+# The VPS runs onlyoffice/documentserver with JWT_ENABLED=true and
+# JWT_HEADER=Authorization, published on 127.0.0.1:8082. This keeps the same
+# port and the same flags so no code path has to branch on environment.
+#
+# The image has a native linux/arm64 build, so this runs without emulation on
+# Apple Silicon.
+#
+#   docker compose -f deploy/local/docker-compose.yml up -d
+#
+# Requires ~3 GB of free disk. See README.md in this directory.
+
+services:
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    container_name: cubic-onlyoffice-local
+    restart: unless-stopped
+    # Loopback only — never expose the document server directly, same as prod
+    # where nginx has no route to it.
+    ports:
+      - "127.0.0.1:8082:80"
+    environment:
+      JWT_ENABLED: "true"
+      JWT_HEADER: "Authorization"
+      # Local-only secret. Deliberately NOT the production secret — a dev box
+      # should not hold prod credentials. Must match ONLYOFFICE_JWT_SECRET in
+      # .env.local.
+      JWT_SECRET: "cubic-local-dev-onlyoffice-secret"
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_log:/var/log/onlyoffice
+      - onlyoffice_cache:/var/lib/onlyoffice
+      - onlyoffice_db:/var/lib/postgresql
+    # Use the default docker0 bridge so host-gateway (172.17.0.1) is reachable.
+    # Compose's own project network (172.18/16) cannot hairpin to the host the
+    # same way, which breaks download/callback and leaves the editor blank.
+    # (Learned the hard way by the scrapper stack — do not "simplify" this.)
+    network_mode: bridge
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+volumes:
+  onlyoffice_data:
+  onlyoffice_log:
+  onlyoffice_cache:
+  onlyoffice_db:

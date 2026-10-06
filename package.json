@@ -1,0 +1,30 @@
+{
+  "name": "cubic-data-team",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "next dev --turbopack --port 3001 --hostname 127.0.0.1",
+    "dev:backend": "cargo run --manifest-path backend/Cargo.toml",
+    "build": "next build",
+    "build:backend": "cargo build --release --manifest-path backend/Cargo.toml",
+    "start": "RUST_BACKEND_PORT=3000 cargo run --release --manifest-path backend/Cargo.toml",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "15.5.23",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.23",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

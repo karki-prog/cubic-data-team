@@ -1,0 +1,23 @@
+[Unit]
+Description=Cubic Data Team dashboard (Rust backend + static Next UI)
+After=network.target
+
+[Service]
+Type=simple
+User=__DEPLOY_USER__
+Group=__DEPLOY_USER__
+WorkingDirectory=/opt/cubic-data-team
+EnvironmentFile=-/opt/cubic-data-team/.env.production
+Environment=RUST_BACKEND_PORT=3010
+Environment=RUST_LOG=info
+ExecStart=/opt/cubic-data-team/backend/target/release/cubic-backend
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cubic-data-team
+
+[Install]
+WantedBy=multi-user.target
+

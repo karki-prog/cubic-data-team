@@ -1,0 +1,31 @@
+{
+  "name": "Cubic AI",
+  "guid": "asc.{C0B1C4A1-7E42-4D6B-9F3A-2E5D8B7A1C90}",
+  "version": "1.0.0",
+  "variations": [
+    {
+      "description": "Draft resume sections with AI",
+      "url": "index.html",
+      "icons": [
+        "resources/icon.png",
+        "resources/icon@2x.png"
+      ],
+      "isViewer": false,
+      "EditorsSupport": [
+        "word"
+      ],
+      "type": "panel",
+      "isVisual": true,
+      "isModal": false,
+      "isInsideMode": false,
+      "initDataType": "none",
+      "initData": "",
+      "isUpdateOleOnResize": false,
+      "buttons": [],
+      "size": [
+        720,
+        900
+      ]
+    }
+  ]
+}

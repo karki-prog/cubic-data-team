@@ -1,0 +1,630 @@
+/* —— Admin chrome: dashboard-shaped title bar, no site footer ——— */
+
+.admin-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  /* White-themed admin: the surface itself is white, panels are separated by
+     hairlines rather than by a tinted page behind them. */
+  background: #fff;
+}
+
+.admin-topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.admin-topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 24px;
+}
+
+.admin-topbar-copy {
+  min-width: 0;
+}
+
+.admin-brand {
+  display: block;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #10141a;
+  text-decoration: none;
+}
+
+.admin-topbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-exit {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #6f6f6f;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admin-exit:hover {
+  color: #10141a;
+}
+
+.admin-rule {
+  height: 1px;
+  background: var(--line);
+}
+
+.admin-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 22px 24px 40px;
+}
+
+@media (max-width: 720px) {
+  .admin-topbar-inner {
+    padding: 12px 16px;
+  }
+
+  .admin-brand {
+    font-size: 17px;
+  }
+
+  .admin-main {
+    padding: 16px 14px 30px;
+  }
+}
+
+/* —— Fact list ————————————————————————————————————————— */
+
+.admin-facts {
+  margin: 16px 0 0;
+  padding: 14px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.admin-facts li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.admin-fact-key {
+  min-width: 74px;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-weight: 600;
+  color: #6f6f6f;
+}
+
+.admin-fact-val {
+  color: #10141a;
+}
+
+/* —— Sub-page panel ————————————————————————————————————— */
+
+.admin-panel {
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f2f4f7;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #10141a;
+}
+
+.admin-panel-text {
+  margin: 12px 0 0;
+  max-width: 62ch;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #10141a;
+}
+
+/* —— Denied ————————————————————————————————————————————— */
+
+.admin-denied {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px;
+  background: var(--page);
+}
+
+.admin-denied-card {
+  max-width: 430px;
+  padding: 28px 30px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 10px 28px rgba(16, 24, 40, 0.05);
+  text-align: center;
+}
+
+.admin-denied-card h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #10141a;
+}
+
+.admin-denied-card p {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #6f6f6f;
+}
+
+.admin-denied-link {
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #10141a;
+  text-decoration: none;
+}
+
+.admin-denied-link:hover {
+  text-decoration: underline;
+}
+
+.admin-back {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6f6f6f;
+  text-decoration: none;
+}
+
+.admin-back:hover {
+  color: #10141a;
+}
+
+@media (max-width: 720px) {
+  .admin-main {
+    padding: 22px 16px 40px;
+  }
+
+  .admin-title {
+    font-size: 22px;
+  }
+}
+
+/* —— Office editor ————————————————————————————————————— */
+
+.office-open {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.office-label {
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #10141a;
+}
+
+.office-open-row {
+  display: flex;
+  gap: 10px;
+}
+
+.office-input {
+  flex: 1 1 auto;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #10141a;
+}
+
+.office-input:focus {
+  outline: none;
+  border-color: #c9d0d7;
+}
+
+.office-btn {
+  height: 38px;
+  padding: 0 18px;
+  border: 1px solid #10141a;
+  border-radius: 9px;
+  background: #10141a;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+.office-btn:hover {
+  filter: brightness(0.94);
+}
+
+.office-hint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #6f6f6f;
+}
+
+.office-hint code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: #f2f4f7;
+  font-size: 11.5px;
+}
+
+.office-panel {
+  margin-top: 16px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.office-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #fafbfc;
+}
+
+.office-file {
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #10141a;
+}
+
+.office-close {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #6f6f6f;
+  cursor: pointer;
+}
+
+.office-close:hover {
+  color: #10141a;
+  border-color: #c9d0d7;
+}
+
+.office-wrap {
+  position: relative;
+}
+
+/* The editor injects an iframe that needs a real height to render at all. */
+.office-frame {
+  width: 100%;
+  height: min(78dvh, 900px);
+  background: #fff;
+}
+
+.office-loading,
+.office-error {
+  padding: 16px 18px;
+  font-size: 13px;
+}
+
+.office-loading {
+  color: #6f6f6f;
+}
+
+.office-error {
+  border-left: 3px solid #10141a;
+  background: #f7f8fa;
+  color: #10141a;
+}
+
+.office-error p {
+  margin: 6px 0 0;
+  color: #6f6f6f;
+}
+
+/* —— Resume Maker banner ——————————————————————————————— */
+
+.admin-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-banner:hover {
+  transform: translateY(-1px);
+  border-color: #c9d0d7;
+  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.05), 0 10px 24px rgba(16, 24, 40, 0.07);
+}
+
+.admin-banner:focus-visible {
+  outline: 2px solid #10141a;
+  outline-offset: 2px;
+}
+
+.admin-banner-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #f2f4f7;
+  color: #10141a;
+}
+
+.admin-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-banner-title {
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #10141a;
+}
+
+.admin-banner-blurb {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #6f6f6f;
+}
+
+.admin-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border-radius: 9px;
+  background: #10141a;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* —— Full-window editor (outside the admin chrome) ——————— */
+
+/* Full-window editor: no chrome of ours, ONLYOFFICE owns the whole tab.
+   White end to end — the loading ground must match the editor's white UI or
+   the tab flashes grey before the iframe paints. */
+.office-full {
+  height: 100dvh;
+  width: 100%;
+  background: #fff;
+  overflow: hidden;
+}
+
+.office-full .office-wrap,
+.office-full .office-frame {
+  height: 100%;
+}
+
+/* The editor fills everything the toolbar leaves. */
+@media (max-width: 720px) {
+    .admin-banner {
+    flex-wrap: wrap;
+  }
+
+  .admin-banner-cta {
+    margin-left: 0;
+  }
+}
+
+/* The shared auth button is Cubic red; inside the white admin it becomes ink so
+   the surface stays single-accent. Scoped here — the dashboard keeps its red. */
+.admin-root .cubic-auth-btn {
+  background: #10141a;
+  color: #fff;
+}
+
+.admin-root .cubic-auth-btn:hover {
+  background: #2b323c;
+}
+
+/* —— Template library ————————————————————————————————— */
+
+.tpl-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.tpl-title {
+  margin: 0;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #10141a;
+}
+
+.tpl-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6f6f6f;
+}
+
+.tpl-add {
+  flex: 0 0 auto;
+  padding: 9px 16px;
+  border-radius: 9px;
+  background: #10141a;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+.tpl-add:hover {
+  background: #2b323c;
+}
+
+.tpl-add.is-busy {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.tpl-error {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid #10141a;
+  border-radius: 8px;
+  background: #f7f8fa;
+  font-size: 13px;
+  color: #10141a;
+}
+
+.tpl-empty {
+  margin: 0;
+  padding: 22px 2px;
+  font-size: 13px;
+  color: #6f6f6f;
+}
+
+.tpl-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.tpl-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 2px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tpl-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f2f4f7;
+  color: #10141a;
+}
+
+.tpl-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tpl-name {
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #10141a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl-detail {
+  font-size: 12px;
+  color: #6f6f6f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tpl-open {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #10141a;
+  font-family: var(--font-sora), Helvetica Neue, Arial, sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tpl-open:hover {
+  background: #2b323c;
+}
+
+.tpl-remove {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #6f6f6f;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tpl-remove:hover:not(:disabled) {
+  color: #10141a;
+  border-color: #c9d0d7;
+}
+
+.tpl-remove:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .tpl-row {
+    flex-wrap: wrap;
+  }
+
+  .tpl-meta {
+    flex-basis: 100%;
+    order: -1;
+  }
+}
